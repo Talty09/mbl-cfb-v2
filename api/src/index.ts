@@ -1,4 +1,6 @@
 import { api } from './app';
+import { getDb } from './lib/db';
+import { runIngestSlice, runMaintenance } from './services/ingest';
 import type { Env } from './types';
 
 /**
@@ -20,15 +22,29 @@ export default {
   },
 
   /**
-   * CFBD ingest. Fires every 5 minutes and handles exactly one slice of work,
-   * because a scheduled handler gets the same 10 ms CPU budget as a request —
-   * see services/ingest once implemented.
+   * CFBD ingest, every 5 minutes. Handles exactly one slice of work per firing,
+   * because a scheduled handler gets the same 10 ms CPU budget as a request.
+   *
+   * Failures are swallowed here on purpose: the slice already recorded the
+   * message in `sync_state.last_error` (surfaced by `/api/meta`), and throwing
+   * would only produce a duplicate, less informative cron error.
    */
-  async scheduled(
-    _controller: ScheduledController,
-    _env: Env,
-    _ctx: ExecutionContext,
-  ): Promise<void> {
-    // TODO(phase 3): advance one ingest slice from sync_state.
+  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    const db = getDb(env);
+
+    try {
+      const outcome = await runIngestSlice(db, env);
+      console.log(`ingest ${outcome.stage}: ${outcome.detail}`);
+    } catch (error) {
+      console.error('ingest slice failed:', error);
+    }
+
+    // Housekeeping runs after the slice and outside its error path, so a CFBD
+    // outage doesn't stop expired sessions being reaped.
+    ctx.waitUntil(
+      runMaintenance(db).catch((error: unknown) => {
+        console.error('maintenance failed:', error);
+      }),
+    );
   },
 } satisfies ExportedHandler<Env>;

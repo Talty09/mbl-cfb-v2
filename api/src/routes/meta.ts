@@ -26,7 +26,7 @@ metaRoutes.get('/meta', async (c) => {
       .from(seasons)
       .where(eq(seasons.year, season))
       .get(),
-    readCalendar(db),
+    readCalendar(db, season),
     db
       .select({ n: sql<number>`count(*)` })
       .from(games)

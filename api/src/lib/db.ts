@@ -14,3 +14,36 @@ export function getDb(env: Env) {
 }
 
 export type Db = ReturnType<typeof getDb>;
+
+/**
+ * D1 caps bound parameters per statement, so a single multi-row INSERT of the
+ * ~135 FBS teams or a week of games would be rejected. Conservative on purpose:
+ * being under the real ceiling only costs extra statements, while being over it
+ * fails the whole ingest slice.
+ */
+export const D1_MAX_BOUND_PARAMS = 100;
+
+/**
+ * Insert in chunks sized so each statement stays within the parameter budget.
+ *
+ * Sequential rather than batched: the free plan also caps queries per Worker
+ * invocation (50), and awaiting each chunk keeps the count visible and bounded
+ * instead of hidden inside a batch.
+ */
+export async function insertChunked<T>(
+  rows: T[],
+  columnsPerRow: number,
+  insert: (chunk: T[]) => Promise<unknown>,
+): Promise<{ rows: number; statements: number }> {
+  if (rows.length === 0) return { rows: 0, statements: 0 };
+
+  const perChunk = Math.max(1, Math.floor(D1_MAX_BOUND_PARAMS / Math.max(1, columnsPerRow)));
+  let statements = 0;
+
+  for (let i = 0; i < rows.length; i += perChunk) {
+    await insert(rows.slice(i, i + perChunk));
+    statements += 1;
+  }
+
+  return { rows: rows.length, statements };
+}

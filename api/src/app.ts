@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { ApiError } from 'shared';
 import { attachSession } from './middleware/auth';
+import { adminRoutes } from './routes/admin';
 import { authRoutes } from './routes/auth';
 import { metaRoutes } from './routes/meta';
 import type { AppEnv } from './types';
@@ -21,6 +22,7 @@ api.use('*', attachSession);
 
 api.route('/', authRoutes);
 api.route('/', metaRoutes);
+api.route('/', adminRoutes);
 
 api.notFound((c) => c.json<ApiError>({ error: 'Not found' }, 404));
 

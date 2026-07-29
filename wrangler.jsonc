@@ -14,6 +14,12 @@
     // Deep links like /standings must serve index.html, not 404.
     "not_found_handling": "single-page-application",
     // Without this, the asset handler answers first and /api/* never reaches Hono.
+    //
+    // Note that `wrangler dev --test-scheduled` is not usable here: its
+    // /__scheduled hook is unreachable behind the SPA fallback, and the fetch
+    // handler forwards every non-/api path to ASSETS anyway. The cron is covered
+    // by calling the scheduled handler directly in index.test.ts, and a slice can
+    // be forced in a running app via POST /api/admin/sync.
     "run_worker_first": ["/api/*"]
   },
 

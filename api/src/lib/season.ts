@@ -8,6 +8,13 @@ import type { Env } from '../types';
 export const CALENDAR_KEY = 'calendar';
 
 export interface CalendarCursor {
+  /**
+   * The season this position belongs to. Without it, a stored cursor from the
+   * previous season reads as valid — so at the year rollover the per-week ingest
+   * stages would target the wrong (season, week) pair, and the header would
+   * advertise last season's final week.
+   */
+  season: number;
   week: number;
   seasonType: SeasonType;
 }
@@ -29,10 +36,12 @@ export async function resolveSeason(db: Db, env: Env): Promise<number> {
 }
 
 /**
- * Where the CFBD calendar says we are. Null until the ingest has run at least
- * once — callers must treat "no week yet" as a normal preseason state.
+ * Where the CFBD calendar says we are, for the given season. Null until the
+ * ingest has run at least once, or when the stored cursor belongs to a different
+ * season — both mean "no current week", which callers must treat as the normal
+ * preseason state.
  */
-export async function readCalendar(db: Db): Promise<CalendarCursor | null> {
+export async function readCalendar(db: Db, season: number): Promise<CalendarCursor | null> {
   const row = await db
     .select({ cursor: syncState.cursor })
     .from(syncState)
@@ -44,7 +53,11 @@ export async function readCalendar(db: Db): Promise<CalendarCursor | null> {
   try {
     const parsed = JSON.parse(row.cursor) as Partial<CalendarCursor>;
     if (typeof parsed.week !== 'number') return null;
+    // Stale cursor from another season: report no current week rather than a
+    // confidently wrong one. The next calendar sync overwrites it.
+    if (parsed.season !== season) return null;
     return {
+      season,
       week: parsed.week,
       seasonType: parsed.seasonType === 'postseason' ? 'postseason' : 'regular',
     };
