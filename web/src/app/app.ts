@@ -26,8 +26,10 @@ export class App {
     { path: '/trash-talk', label: 'Trash Talk' },
   ];
 
-  protected signOut(): void {
-    this.auth.signOut();
-    this.router.navigate(['/login']);
+  protected async signOut(): Promise<void> {
+    // Await the revoke so we don't navigate away while the session is still live
+    // on the server.
+    await this.auth.signOut();
+    await this.router.navigate(['/login']);
   }
 }

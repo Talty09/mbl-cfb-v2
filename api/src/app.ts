@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import type { ApiError } from 'shared';
+import { attachSession } from './middleware/auth';
+import { authRoutes } from './routes/auth';
 import { metaRoutes } from './routes/meta';
 import type { AppEnv } from './types';
 
@@ -13,6 +15,11 @@ import type { AppEnv } from './types';
  */
 export const api = new Hono<AppEnv>().basePath('/api');
 
+// Resolves the session cookie for every route. It never rejects — read views are
+// public, and only the write routes add `requireAuth`.
+api.use('*', attachSession);
+
+api.route('/', authRoutes);
 api.route('/', metaRoutes);
 
 api.notFound((c) => c.json<ApiError>({ error: 'Not found' }, 404));

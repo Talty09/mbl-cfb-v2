@@ -3,10 +3,19 @@
     <span class="logo-tile">MB</span>
     <h1 class="title">Sign in to the League</h1>
 
-    <label class="mbl-label" for="email">Email</label>
-    <input class="mbl-input" id="email" name="email" type="email" [(ngModel)]="email" autocomplete="email" />
+    <label class="mbl-label" for="username">Username</label>
+    <input
+      class="mbl-input"
+      id="username"
+      name="username"
+      type="text"
+      [(ngModel)]="username"
+      autocomplete="username"
+      autocapitalize="none"
+      spellcheck="false"
+    />
 
-    <label class="mbl-label" for="password">Password</label>
+    <label class="mbl-label" for="password">Passphrase</label>
     <input
       class="mbl-input"
       id="password"

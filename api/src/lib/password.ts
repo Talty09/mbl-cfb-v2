@@ -26,6 +26,7 @@
  * bench-password`. Raise it only alongside a real measurement.
  */
 
+import { fromBase64Url, toBase64Url } from './encoding';
 import { BITS_PER_WORD, WORDLIST } from './wordlist';
 
 const ALGORITHM = 'pbkdf2-sha256';
@@ -47,19 +48,6 @@ const DERIVED_BITS = 256;
 
 /** Words per generated passphrase. 6 x 8 bits = 48 bits of entropy. */
 export const PASSPHRASE_WORDS = 6;
-
-function toBase64Url(bytes: Uint8Array): string {
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function fromBase64Url(value: string): Uint8Array<ArrayBuffer> {
-  const binary = atob(value.replace(/-/g, '+').replace(/_/g, '/'));
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-}
 
 /**
  * `Uint8Array<ArrayBuffer>` rather than plain `Uint8Array`: since TypeScript 5.7

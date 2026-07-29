@@ -19,6 +19,15 @@ export interface SessionUser {
   isCommissioner: boolean;
 }
 
+/**
+ * Who the caller is. `user` is null for guests rather than a 401, because
+ * browsing unauthenticated is a supported state and the client shouldn't have to
+ * treat the common case as an exception.
+ */
+export interface SessionResponse {
+  user: SessionUser | null;
+}
+
 /** Minimal manager identity, embedded wherever a name and avatar are shown. */
 export interface ManagerRef {
   id: string;

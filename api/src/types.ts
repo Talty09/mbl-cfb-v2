@@ -1,29 +1,27 @@
-/**
- * Worker bindings, declared by hand rather than leaning on `wrangler types` so
- * the contract is reviewable in the diff. Keep in sync with wrangler.jsonc.
- */
-export interface Env {
-  /** D1 (SQLite). Binding declared under `d1_databases`. */
-  DB: D1Database;
-  /** Static assets binding — the built Angular SPA. */
-  ASSETS: Fetcher;
-  /** Season the app operates on, e.g. "2026". A var, not a secret. */
-  CURRENT_SEASON: string;
-  /** College Football Data API key. A secret; only the ingest reads it. */
-  CFBD_API_KEY: string;
-}
+import type { SessionUser } from 'shared';
 
-/** Hono generic parameter, with the authenticated user attached by middleware. */
+/**
+ * Worker bindings.
+ *
+ * Generated from wrangler.jsonc by `npm run cf-typegen`, which writes
+ * worker-configuration.d.ts at the repo root (committed, so typechecking and CI
+ * don't need to run wrangler first). Aliasing rather than hand-writing the shape
+ * means the bindings cannot drift from the config that actually provisions them —
+ * and it's the type `cloudflare:test` hands to integration tests.
+ *
+ * Rerun `npm run cf-typegen` after changing bindings or vars.
+ */
+export type Env = Cloudflare.Env;
+
+/** Hono generic parameter, with the authenticated manager attached by middleware. */
 export interface AppEnv {
   Bindings: Env;
   Variables: {
-    /** Set by `withSession`; absent for guests, who get read-only access. */
-    user?: {
-      id: string;
-      username: string;
-      displayName: string;
-      avatarHue: number;
-      isCommissioner: boolean;
-    };
+    /**
+     * Set by `attachSession`; absent for guests, who get read-only access.
+     * Uses `shared`'s SessionUser so the value here and the one on the wire
+     * cannot drift apart.
+     */
+    user?: SessionUser;
   };
 }
