@@ -1,0 +1,24 @@
+{
+  "name": "api",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Most Baller League Worker — Hono API, D1 access, and CFBD ingest",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.32",
+    "shared": "*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.19.0",
+    "@cloudflare/workers-types": "^5.20260729.1",
+    "@types/node": "^26.1.2",
+    "typescript": "~5.9.2",
+    "vitest": "^4.1.10"
+  }
+}

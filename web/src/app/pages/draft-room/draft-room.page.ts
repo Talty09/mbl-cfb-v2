@@ -2,10 +2,15 @@ import { Component } from '@angular/core';
 import { CURRENT_SEASON } from '../../core/models';
 
 /**
- * Draft Room: live 10-round snake draft. Pick board (managers × rounds),
- * on-the-clock card with countdown, available-teams panel with search.
- * Data: GET/POST /api/draft/:year + socket.io 'draft:pick' events +
- * /api/teams/fbs for the pool.
+ * Draft Room: 10-round snake draft. Pick board (managers × rounds),
+ * on-the-clock card, available-teams panel with search.
+ *
+ * There is no pick clock — the draft runs asynchronously over days and the
+ * commissioner nudges managers out of band — so the on-the-clock card shows how
+ * long the current manager has been up rather than a countdown.
+ *
+ * Data: GET /api/draft, POST /api/draft/pick, GET /api/teams?available=1,
+ * refreshed by polling /api/pulse.
  */
 @Component({
   selector: 'app-draft-room-page',

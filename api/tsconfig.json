@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": ["@cloudflare/workers-types"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "shared": ["../shared/src/index.ts"]
+    }
+  },
+  // Worker code only. The scripts/ folder runs in Node and is checked by
+  // tsconfig.scripts.json, so that Node globals cannot leak in here and
+  // typecheck clean against a runtime that doesn't have them.
+  "include": ["src/**/*.ts", "../shared/src/**/*.ts"]
+}

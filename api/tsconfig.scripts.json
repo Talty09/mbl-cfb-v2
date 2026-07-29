@@ -1,0 +1,14 @@
+{
+  // Build-time tooling that runs under tsx in Node — the seed generator and the
+  // password benchmark. Kept separate from tsconfig.json so Worker code is never
+  // checked against Node's globals.
+  //
+  // Only `types` is overridden. Inheriting `moduleResolution: bundler` matters:
+  // nodenext would demand explicit .js extensions on relative imports, which tsx
+  // does not require and the rest of the codebase does not use.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["scripts/**/*.ts", "src/lib/password.ts", "src/lib/wordlist.ts"]
+}

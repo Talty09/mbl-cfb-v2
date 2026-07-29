@@ -1,6 +1,6 @@
 {
-  "name": "most-baller-league",
-  "version": "0.0.0",
+  "name": "web",
+  "version": "2.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
@@ -18,16 +18,15 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "rxjs": "~7.8.0",
-    "socket.io-client": "^4.8.3",
+    "shared": "*",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular/build": "^21.2.0",
     "@angular/cli": "^21.2.0",
     "@angular/compiler-cli": "^21.2.0",
-    "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.1.10"
   }
 }
