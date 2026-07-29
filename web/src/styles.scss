@@ -1,0 +1,148 @@
+// Most Baller League design tokens — source of truth: design_handoff_mbl/README.md
+:root {
+  // Backgrounds
+  --mbl-bg: #0b0d11;
+  --mbl-bg-deep: #07080b;
+  --mbl-surface: #12151c;
+  --mbl-well: #0e1117;
+  --mbl-chip: #171b24;
+
+  // Borders
+  --mbl-border: #232937;
+  --mbl-divider: #1a1f2a;
+  --mbl-border-hover: #39415a;
+
+  // Text
+  --mbl-text: #edeff4;
+  --mbl-text-2: #b9c0d0;
+  --mbl-muted: #8b93a6;
+  --mbl-disabled: #4a5163;
+
+  // Accent
+  --mbl-gold: #f2b322;
+  --mbl-gold-hover: #ffcb4d;
+  --mbl-gold-tint: rgba(242, 179, 34, 0.06);
+
+  // Status
+  --mbl-red: #ff6b6b;
+  --mbl-red-bright: #ff4d4d;
+  --mbl-green: #3dd68c;
+
+  // Type
+  --mbl-font-body: 'Barlow', sans-serif;
+  --mbl-font-display: 'Barlow Condensed', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+body {
+  background: var(--mbl-bg);
+  color: var(--mbl-text);
+  font-family: var(--mbl-font-body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+a {
+  color: var(--mbl-gold);
+  text-decoration: none;
+}
+
+// Shared primitives used across views
+.mbl-card {
+  background: var(--mbl-surface);
+  border: 1px solid var(--mbl-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.mbl-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--mbl-muted);
+}
+
+.mbl-input {
+  width: 100%;
+  background: var(--mbl-well);
+  border: 1px solid var(--mbl-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--mbl-text);
+  font-family: var(--mbl-font-body);
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--mbl-gold);
+  }
+}
+
+.mbl-btn-primary {
+  background: var(--mbl-gold);
+  color: var(--mbl-bg-deep);
+  border: none;
+  border-radius: 8px;
+  padding: 13px;
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 1px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--mbl-gold-hover);
+  }
+
+  &:disabled {
+    background: var(--mbl-chip);
+    color: var(--mbl-disabled);
+    cursor: default;
+  }
+}
+
+.mbl-btn-outline {
+  background: transparent;
+  color: var(--mbl-text-2);
+  border: 1px solid var(--mbl-border);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--mbl-border-hover);
+  }
+}
+
+@keyframes mblPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}

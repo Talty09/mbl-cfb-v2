@@ -1,0 +1,142 @@
+.header {
+  background: var(--mbl-bg-deep);
+  border-bottom: 1px solid var(--mbl-border);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--mbl-text);
+}
+
+.logo-tile {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--mbl-gold);
+  color: var(--mbl-bg-deep);
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 24px;
+  border-radius: 8px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.wordmark {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--mbl-surface);
+  border: 1px solid var(--mbl-border);
+  border-radius: 999px;
+  padding: 5px 12px 5px 6px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--mbl-bg-deep);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.sign-out {
+  background: none;
+  border: none;
+  color: var(--mbl-muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--mbl-gold);
+  }
+}
+
+.sign-in-link {
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--mbl-bg-deep);
+  border-bottom: 1px solid var(--mbl-border);
+  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 12px 14px;
+  color: var(--mbl-text-2);
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+
+  &.active {
+    color: var(--mbl-gold);
+    border-bottom-color: var(--mbl-gold);
+  }
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.footer {
+  border-top: 1px solid var(--mbl-border);
+  padding: 18px;
+  text-align: center;
+}

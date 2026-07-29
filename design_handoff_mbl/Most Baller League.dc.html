@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#0B0D11;}
+body{font-family:'Barlow',sans-serif;color:#EDEFF4;}
+a{color:#F2B322;text-decoration:none;}
+a:hover{color:#FFCB4D;}
+*{box-sizing:border-box;}
+@keyframes mblTicker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes mblPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:#232937;border-radius:5px;}
+::-webkit-scrollbar-track{background:#0B0D11;}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0B0D11;font-family:'Barlow',sans-serif;color:#EDEFF4;display:flex;flex-direction:column;">
+  <header style="background:#07080B;border-bottom:1px solid #232937;">
+    <div style="max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;background:#F2B322;color:#07080B;display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;letter-spacing:.5px;border-radius:6px;">MB</div>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;letter-spacing:2px;line-height:1;">MOST BALLER LEAGUE</div>
+          <div style="font-size:11px;letter-spacing:3px;color:#8B93A6;font-weight:600;">FANTASY COLLEGE FOOTBALL · EST. 2025</div>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:14px;">
+        <div style="display:flex;align-items:center;gap:7px;background:#12151C;border:1px solid #232937;border-radius:999px;padding:6px 14px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#FF4D4D;animation:mblPulse 1.4s infinite;"></span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1.5px;color:#FF6B6B;">LIVE</span>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:2px;color:#F2B322;">WEEK 9 · 2026</div>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:9px;background:#12151C;border:1px solid #232937;border-radius:999px;padding:5px 6px 5px 5px;">
+            <span style="width:28px;height:28px;border-radius:50%;background:{{ me.bg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;color:#07080B;">{{ me.initials }}</span>
+            <span style="font-weight:600;font-size:14px;">{{ me.name }}</span>
+            <button onClick="{{ signOut }}" style="background:none;border:1px solid #232937;border-radius:999px;padding:4px 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:1.5px;color:#8B93A6;cursor:pointer;" style-hover="color:#EDEFF4;border-color:#39415a;">SIGN OUT</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+  <sc-if value="{{ showTicker }}" hint-placeholder-val="{{ true }}">
+    <div style="background:#0E1117;border-bottom:1px solid #232937;overflow:hidden;white-space:nowrap;">
+      <div style="display:inline-flex;gap:0;animation:mblTicker 40s linear infinite;padding:8px 0;">
+        <sc-for list="{{ tickerItems }}" as="t" hint-placeholder-count="8">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;color:#B9C0D0;padding:0 18px;border-right:1px solid #232937;">{{ t }}</span>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:grid;place-items:center;padding:60px 20px;">
+      <div style="width:100%;max-width:400px;background:#12151C;border:1px solid #232937;border-radius:12px;padding:32px;">
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="width:56px;height:56px;background:#F2B322;color:#07080B;display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;border-radius:8px;margin:0 auto 12px;">MB</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;letter-spacing:2px;">SIGN IN TO THE LEAGUE</div>
+          <div style="color:#8B93A6;font-size:13px;">Draft your squad. Defend your name.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:11px;letter-spacing:2px;color:#8B93A6;font-weight:600;">EMAIL
+            <input value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" onKeyDown="{{ onLoginKey }}" placeholder="you@example.com" style="background:#0E1117;border:1px solid #232937;border-radius:8px;padding:12px 14px;color:#EDEFF4;font-family:'Barlow',sans-serif;font-size:14px;outline:none;" style-focus="border-color:#F2B322;"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:11px;letter-spacing:2px;color:#8B93A6;font-weight:600;">PASSWORD
+            <input type="password" value="{{ loginPass }}" onChange="{{ onLoginPass }}" onKeyDown="{{ onLoginKey }}" placeholder="••••••••" style="background:#0E1117;border:1px solid #232937;border-radius:8px;padding:12px 14px;color:#EDEFF4;font-family:'Barlow',sans-serif;font-size:14px;outline:none;" style-focus="border-color:#F2B322;"></label>
+          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}">
+            <div style="color:#FF6B6B;font-size:13px;font-weight:600;">{{ loginErr }}</div>
+          </sc-if>
+          <button onClick="{{ doLogin }}" style="background:#F2B322;border:none;border-radius:8px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;letter-spacing:2px;color:#07080B;cursor:pointer;" style-hover="background:#FFCB4D;">SIGN IN</button>
+          <button onClick="{{ skipLogin }}" style="background:none;border:1px solid #232937;border-radius:8px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:2px;color:#8B93A6;cursor:pointer;" style-hover="color:#EDEFF4;border-color:#39415a;">BROWSE WITHOUT SIGNING IN</button>
+          <a href="#" style="text-align:center;font-size:13px;">Forgot password?</a>
+        </div>
+        <div style="margin-top:20px;padding:10px 14px;background:#0E1117;border:1px solid #232937;border-radius:8px;font-size:12px;color:#8B93A6;">
+          Demo: sign in as any manager, e.g. <span style="color:#F2B322;font-weight:600;">chris@mbl.com</span> — Chris is on the clock in the draft room.
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ true }}">
+  <nav style="background:#0B0D11;border-bottom:1px solid #232937;position:sticky;top:0;z-index:20;">
+    <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;gap:4px;overflow-x:auto;">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+        <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+      </sc-for>
+    </div>
+  </nav>
+  <main style="max-width:1200px;margin:0 auto;padding:24px 20px 60px;width:100%;">
+
+    <sc-if value="{{ isScoreboard }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ showBaller }}" hint-placeholder-val="{{ true }}">
+        <div style="background:linear-gradient(105deg,#1A1608 0%,#12151C 55%);border:1px solid #3D3113;border-radius:10px;padding:18px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:26px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:{{ baller.bg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;color:#07080B;">{{ baller.initials }}</div>
+          <div style="flex:1;min-width:220px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:3px;color:#F2B322;">BALLER OF THE WEEK · WEEK 8</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;letter-spacing:1px;">{{ baller.name }}</div>
+            <div style="color:#8B93A6;font-size:14px;">{{ baller.blurb }}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:44px;color:#F2B322;line-height:1;">{{ baller.pts }}</div>
+            <div style="font-size:11px;letter-spacing:2px;color:#8B93A6;font-weight:600;">POINTS</div>
+          </div>
+        </div>
+      </sc-if>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px;">
+        <h2 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;letter-spacing:2px;">WEEK 9 SCOREBOARD</h2>
+        <span style="color:#8B93A6;font-size:13px;">1 pt per win · 2 pts for a ranked win</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;">
+        <sc-for list="{{ games }}" as="g" hint-placeholder-count="6">
+          <div style="background:#12151C;border:1px solid #232937;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="{{ g.statusStyle }}">{{ g.clock }}</span>
+              <sc-if value="{{ g.note }}" hint-placeholder-val="{{ false }}">
+                <span style="{{ g.noteStyle }}">{{ g.note }}</span>
+              </sc-if>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#F2B322;min-width:22px;">{{ g.rankA }}</span>
+              <span style="{{ g.nameAStyle }}">{{ g.teamA }}</span>
+              <span style="font-size:12px;color:#8B93A6;">{{ g.recA }}</span>
+              <sc-if value="{{ g.ownerA }}" hint-placeholder-val="{{ false }}">
+                <span style="display:inline-flex;align-items:center;gap:5px;background:#171B24;border:1px solid #232937;border-radius:999px;padding:2px 8px 2px 3px;font-size:11px;font-weight:600;color:#B9C0D0;"><span style="width:14px;height:14px;border-radius:50%;background:{{ g.ownerA.bg }};display:inline-block;"></span>{{ g.ownerA.name }}</span>
+              </sc-if>
+              <span style="{{ g.scoreAStyle }}">{{ g.scoreA }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#F2B322;min-width:22px;">{{ g.rankB }}</span>
+              <span style="{{ g.nameBStyle }}">{{ g.teamB }}</span>
+              <span style="font-size:12px;color:#8B93A6;">{{ g.recB }}</span>
+              <sc-if value="{{ g.ownerB }}" hint-placeholder-val="{{ false }}">
+                <span style="display:inline-flex;align-items:center;gap:5px;background:#171B24;border:1px solid #232937;border-radius:999px;padding:2px 8px 2px 3px;font-size:11px;font-weight:600;color:#B9C0D0;"><span style="width:14px;height:14px;border-radius:50%;background:{{ g.ownerB.bg }};display:inline-block;"></span>{{ g.ownerB.name }}</span>
+              </sc-if>
+              <span style="{{ g.scoreBStyle }}">{{ g.scoreB }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isStandings }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:20px;align-items:start;">
+        <div style="background:#12151C;border:1px solid #232937;border-radius:10px;overflow:hidden;">
+          <div style="padding:16px 18px;border-bottom:1px solid #232937;display:flex;align-items:baseline;gap:12px;">
+            <h2 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;letter-spacing:2px;">SEASON STANDINGS</h2>
+            <span style="color:#8B93A6;font-size:13px;">Through Week 8</span>
+          </div>
+          <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 60px 60px 90px;gap:0 8px;padding:10px 18px 6px;font-size:11px;letter-spacing:1.5px;color:#8B93A6;font-weight:600;">
+            <span>RK</span><span>MANAGER</span><span style="text-align:right;">WK 8</span><span style="text-align:right;">RK-W</span><span style="text-align:right;">TOTAL</span>
+          </div>
+          <sc-for list="{{ standings }}" as="s" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 60px 60px 90px;gap:0 8px;align-items:center;padding:11px 18px;border-top:1px solid #1A1F2A;background:{{ s.rowBg }};">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:{{ s.rankColor }};">{{ s.rank }}</span>
+              <span style="display:flex;align-items:center;gap:10px;min-width:0;">
+                <span style="width:28px;height:28px;border-radius:50%;background:{{ s.bg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;color:#07080B;flex-shrink:0;">{{ s.initials }}</span>
+                <span style="font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.name }}</span>
+              </span>
+              <span style="text-align:right;font-weight:600;color:#B9C0D0;">{{ s.wk }}</span>
+              <span style="text-align:right;font-weight:600;color:#F2B322;">{{ s.rankedWins }}</span>
+              <span style="text-align:right;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;">{{ s.total }}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#12151C;border:1px solid #232937;border-radius:10px;padding:16px 18px;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:3px;color:#FF6B6B;margin-bottom:4px;">RIVALRY WATCH</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;letter-spacing:1px;margin-bottom:2px;">{{ rivalry.title }}</div>
+          <div style="color:#8B93A6;font-size:13px;margin-bottom:14px;">{{ rivalry.sub }}</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#B9C0D0;margin-bottom:8px;">
+            <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:{{ rivalry.aBg }};display:inline-block;"></span>{{ rivalry.aName }}</span>
+            <span style="display:flex;align-items:center;gap:6px;">{{ rivalry.bName }}<span style="width:10px;height:10px;border-radius:2px;background:{{ rivalry.bBg }};display:inline-block;"></span></span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <sc-for list="{{ rivalry.rows }}" as="r" hint-placeholder-count="8">
+              <div style="display:grid;grid-template-columns:1fr 44px 1fr;align-items:center;gap:6px;">
+                <div style="display:flex;justify-content:flex-end;"><div style="height:12px;border-radius:3px;background:{{ r.aBg }};width:{{ r.aW }};"></div></div>
+                <div style="text-align:center;font-size:11px;color:#8B93A6;font-weight:600;">{{ r.label }}</div>
+                <div><div style="height:12px;border-radius:3px;background:{{ r.bBg }};width:{{ r.bW }};"></div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid #232937;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;">{{ rivalry.aTotal }}</span>
+            <span style="font-size:12px;color:#8B93A6;font-weight:600;align-self:center;letter-spacing:2px;">SEASON PTS</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;">{{ rivalry.bTotal }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isWeeks }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;letter-spacing:2px;margin-right:8px;">PAST SCORES</span>
+        <sc-for list="{{ weekChips }}" as="w" hint-placeholder-count="8">
+          <button onClick="{{ w.go }}" style="{{ w.style }}">{{ w.label }}</button>
+        </sc-for>
+      </div>
+      <div style="background:#12151C;border:1px solid #232937;border-radius:10px;overflow:hidden;">
+        <div style="display:grid;grid-template-columns:44px minmax(0,1fr) minmax(120px,2fr) 70px 90px;gap:0 10px;padding:12px 18px 6px;font-size:11px;letter-spacing:1.5px;color:#8B93A6;font-weight:600;">
+          <span>RK</span><span>MANAGER</span><span>WEEK SCORE</span><span style="text-align:right;">PTS</span><span style="text-align:right;">SEASON</span>
+        </div>
+        <sc-for list="{{ weekRows }}" as="s" hint-placeholder-count="8">
+          <div style="display:grid;grid-template-columns:44px minmax(0,1fr) minmax(120px,2fr) 70px 90px;gap:0 10px;align-items:center;padding:11px 18px;border-top:1px solid #1A1F2A;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;color:{{ s.rankColor }};">{{ s.rank }}</span>
+            <span style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <span style="width:28px;height:28px;border-radius:50%;background:{{ s.bg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;color:#07080B;flex-shrink:0;">{{ s.initials }}</span>
+              <span style="font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.name }}</span>
+            </span>
+            <span><span style="display:block;height:10px;border-radius:3px;background:{{ s.barBg }};width:{{ s.barW }};"></span></span>
+            <span style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;">{{ s.wk }}</span>
+            <span style="text-align:right;font-weight:600;color:#8B93A6;">{{ s.cume }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRosters }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px;">
+        <h2 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;letter-spacing:2px;">LOCKER ROOM</h2>
+        <span style="color:#8B93A6;font-size:13px;">10 teams per manager · drafted August 2026</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;">
+        <sc-for list="{{ rosters }}" as="m" hint-placeholder-count="6">
+          <div style="background:#12151C;border:1px solid #232937;border-radius:10px;padding:16px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              <span style="width:36px;height:36px;border-radius:50%;background:{{ m.bg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;color:#07080B;">{{ m.initials }}</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;letter-spacing:1px;flex:1;">{{ m.name }}</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:#F2B322;">{{ m.total }}</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <sc-for list="{{ m.teams }}" as="t" hint-placeholder-count="10">
+                <span style="display:inline-flex;align-items:center;gap:6px;background:#171B24;border:1px solid #232937;border-radius:6px;padding:4px 9px;font-size:12px;font-weight:600;color:#D6DAE4;">
+                  <sc-if value="{{ t.rank }}" hint-placeholder-val="{{ false }}"><span style="color:#F2B322;font-family:'Barlow Condensed',sans-serif;font-weight:700;">{{ t.rank }}</span></sc-if>
+                  {{ t.name }}<span style="color:#8B93A6;font-weight:500;">{{ t.rec }}</span>
+                </span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isChat }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:760px;margin:0 auto;background:#12151C;border:1px solid #232937;border-radius:10px;display:flex;flex-direction:column;height:calc(100vh - 260px);min-height:480px;">
+        <div style="padding:14px 18px;border-bottom:1px solid #232937;display:flex;align-items:center;gap:10px;">
+          <h2 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;letter-spacing:2px;">THE TRASH TALK</h2>
+          <span style="color:#8B93A6;font-size:13px;">11 ballers · no refs</span>
+          <span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:#3DD68C;font-weight:600;"><span style="width:7px;height:7px;border-radius:50%;background:#3DD68C;display:inline-block;"></span>4 online</span>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{ messages }}" as="msg" hint-placeholder-count="6">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="width:32px;height:32px;border-radius:50%;background:{{ msg.bg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:#07080B;flex-shrink:0;">{{ msg.initials }}</span>
+              <div style="min-width:0;">
+                <div style="display:flex;align-items:baseline;gap:8px;">
+                  <span style="font-weight:700;font-size:14px;">{{ msg.name }}</span>
+                  <span style="font-size:11px;color:#8B93A6;">{{ msg.time }}</span>
+                </div>
+                <div style="background:#171B24;border:1px solid #232937;border-radius:4px 12px 12px 12px;padding:8px 12px;font-size:14px;color:#D6DAE4;margin-top:3px;display:inline-block;">{{ msg.text }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid #232937;display:flex;gap:10px;">
+          <input value="{{ chatDraft }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" placeholder="Talk your talk…" style="flex:1;background:#0E1117;border:1px solid #232937;border-radius:8px;padding:11px 14px;color:#EDEFF4;font-family:'Barlow',sans-serif;font-size:14px;outline:none;">
+          <button onClick="{{ sendChat }}" style="background:#F2B322;border:none;border-radius:8px;padding:0 22px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1.5px;color:#07080B;cursor:pointer;" style-hover="background:#FFCB4D;">SEND</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDraft }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:3px;color:#FF6B6B;">LIVE DRAFT · SNAKE FORMAT</div>
+          <h2 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;letter-spacing:2px;">ROUND {{ draft.round }} OF 10 · PICK {{ draft.pickNo }}</h2>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:14px;background:#12151C;border:1px solid #232937;border-radius:10px;padding:10px 18px;">
+          <span style="width:36px;height:36px;border-radius:50%;background:{{ draft.onClockBg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;color:#07080B;">{{ draft.onClockInitials }}</span>
+          <div>
+            <div style="font-size:10px;letter-spacing:2px;color:#8B93A6;font-weight:600;">ON THE CLOCK</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;letter-spacing:1px;">{{ draft.onClockName }}</div>
+          </div>
+          <span style="{{ draft.clockStyle }}">{{ draft.clockStr }}</span>
+        </div>
+      </div>
+      <sc-if value="{{ draft.myTurn }}" hint-placeholder-val="{{ false }}">
+        <div style="background:rgba(242,179,34,0.12);border:1px solid #3D3113;border-radius:8px;padding:11px 16px;margin-bottom:16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;letter-spacing:2px;color:#F2B322;">YOU ARE ON THE CLOCK — MAKE YOUR PICK FROM THE AVAILABLE TEAMS</div>
+      </sc-if>
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="flex:2 1 480px;min-width:0;background:#12151C;border:1px solid #232937;border-radius:10px;padding:14px;overflow-x:auto;">
+          <div style="min-width:860px;">
+            <div style="display:grid;grid-template-columns:40px repeat(11,minmax(70px,1fr));gap:4px;margin-bottom:4px;">
+              <span></span>
+              <sc-for list="{{ draft.cols }}" as="c" hint-placeholder-count="11">
+                <span style="display:flex;justify-content:center;"><span style="width:26px;height:26px;border-radius:50%;background:{{ c.bg }};display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:12px;color:#07080B;" title="{{ c.name }}">{{ c.initials }}</span></span>
+              </sc-for>
+            </div>
+            <sc-for list="{{ draft.rows }}" as="row" hint-placeholder-count="10">
+              <div style="display:grid;grid-template-columns:40px repeat(11,minmax(70px,1fr));gap:4px;margin-bottom:4px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#8B93A6;align-self:center;">R{{ row.n }}</span>
+                <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="11">
+                  <div style="{{ cell.style }}">{{ cell.text }}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex:1 1 280px;background:#12151C;border:1px solid #232937;border-radius:10px;display:flex;flex-direction:column;">
+          <div style="padding:14px 16px 10px;border-bottom:1px solid #232937;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;letter-spacing:2px;margin-bottom:10px;">AVAILABLE TEAMS <span style="color:#8B93A6;">({{ draft.poolCount }})</span></div>
+            <input value="{{ draft.q }}" onChange="{{ draft.onQ }}" placeholder="Search teams…" style="width:100%;background:#0E1117;border:1px solid #232937;border-radius:8px;padding:9px 12px;color:#EDEFF4;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" style-focus="border-color:#F2B322;">
+          </div>
+          <div style="overflow-y:auto;max-height:460px;padding:8px;display:flex;flex-direction:column;gap:2px;">
+            <sc-for list="{{ draft.pool }}" as="p" hint-placeholder-count="10">
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;" style-hover="background:#171B24;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;color:#F2B322;min-width:22px;">{{ p.rank }}</span>
+                <span style="font-weight:600;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.name }}</span>
+                <span style="font-size:11px;color:#8B93A6;">{{ p.rec }}</span>
+                <button onClick="{{ p.pick }}" style="{{ p.btnStyle }}">DRAFT</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+  </sc-if>
+  <footer style="margin-top:auto;border-top:1px solid #232937;padding:16px 20px;text-align:center;font-size:12px;color:#8B93A6;letter-spacing:1px;">
+    MOST BALLER LEAGUE · POWERED BY COLLEGEFOOTBALLDATA.COM · 1 PT WIN / 2 PT RANKED WIN
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;requireLogin&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;defaultTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;scoreboard&quot;,&quot;options&quot;:[&quot;scoreboard&quot;,&quot;standings&quot;,&quot;weeks&quot;,&quot;rosters&quot;,&quot;draft&quot;,&quot;chat&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;showTicker&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;showBaller&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
+class Component extends DCLogic {
+  state = { tab: null, week: 8, chatDraft: '', extraMsgs: [], user: null, loginEmail: '', loginPass: '', loginErr: '', clock: 47, extraPicks: [], q: '' };
+
+  componentDidMount() {
+    this.timerId = setInterval(() => {
+      if (this.state.user && (this.state.tab ?? this.props.defaultTab ?? 'scoreboard') === 'draft') {
+        this.setState(s => ({ clock: s.clock > 1 ? s.clock - 1 : 90 }));
+      }
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.timerId); }
+
+  managers = [
+    { name: 'Marcus', hue: 85,  weekly: [7,6,9,5,8,7,10,8], rankedWins: 9 },
+    { name: 'Tyler',  hue: 240, weekly: [8,5,7,7,6,9,8,7],  rankedWins: 7 },
+    { name: 'Dan',    hue: 150, weekly: [6,7,6,8,7,6,9,7],  rankedWins: 6 },
+    { name: 'Jake',   hue: 25,  weekly: [7,8,5,6,9,6,7,6],  rankedWins: 6 },
+    { name: 'Chris',  hue: 300, weekly: [5,6,8,7,6,8,6,7],  rankedWins: 5 },
+    { name: 'Kevin',  hue: 200, weekly: [6,5,7,6,8,7,6,6],  rankedWins: 5 },
+    { name: 'Ryan',   hue: 55,  weekly: [7,6,5,7,5,6,8,5],  rankedWins: 4 },
+    { name: 'Brett',  hue: 330, weekly: [4,7,6,5,7,5,6,7],  rankedWins: 4 },
+    { name: 'Sean',   hue: 120, weekly: [6,4,6,6,5,7,5,6],  rankedWins: 3 },
+    { name: 'Alex',   hue: 265, weekly: [5,6,4,6,6,4,7,5],  rankedWins: 3 },
+    { name: 'Matt',   hue: 10,  weekly: [4,5,5,4,6,5,4,6],  rankedWins: 2 },
+  ];
+
+  teamsByManager = {
+    Marcus: [['Georgia','7-1','#3'],['Oregon','6-2',''],['Ole Miss','6-2','#12'],['Iowa State','6-2',''],['Memphis','7-1',''],['Louisville','5-3',''],['Army','6-2',''],['Washington St','4-4',''],['Toledo','5-3',''],['James Madison','6-2','']],
+    Tyler: [['Ohio State','8-0','#1'],['Texas','7-1','#6'],['USC','5-3',''],['Vanderbilt','5-3',''],['Boise State','7-1',''],['Tulane','6-2',''],['Navy','5-3',''],['UNLV','5-3',''],['Marshall','4-4',''],['Kennesaw St','3-5','']],
+    Dan: [['Penn State','7-1','#4'],['Miami','7-1','#11'],['Tennessee','6-2',''],['SMU','5-3',''],['Colorado','5-3',''],['Duke','4-4',''],['Fresno State','6-2',''],['UTSA','4-4',''],['Ohio','5-3',''],['Liberty','5-3','']],
+    Jake: [['Alabama','6-2','#8'],['Virginia','5-3',''],['Missouri','6-2',''],['Texas Tech','6-2',''],['Utah','5-3',''],['NC State','4-4',''],['South Florida','6-2',''],['Buffalo','5-3',''],['UNT','5-3',''],['Sam Houston','4-4','']],
+    Chris: [['Notre Dame','7-1','#9'],['LSU','5-3',''],['Kansas','5-3',''],['Arizona State','6-2',''],['Baylor','4-4',''],['Wake Forest','4-4',''],['App State','5-3',''],['Rice','3-5',''],['Nevada','3-5',''],['UMass','1-7','']],
+    Kevin: [['Kansas State','5-3','#18'],['Michigan','6-2',''],['Iowa','5-3',''],['Cincinnati','6-2',''],['Cal','4-4',''],['Houston','5-3',''],['Wyoming','4-4',''],['MTSU','3-5',''],['Temple','3-5',''],['Akron','2-6','']],
+    Ryan: [['Clemson','5-3',''],['Florida','4-4',''],['Oklahoma','6-2',''],['Pittsburgh','6-2',''],['Rutgers','4-4',''],['UCF','4-4',''],['Coastal Carolina','5-3',''],['Louisiana','5-3',''],['Bowling Green','4-4',''],['UTEP','2-6','']],
+    Brett: [['BYU','7-1','#14'],['Auburn','4-4',''],['Wisconsin','3-5',''],['Virginia Tech','4-4',''],['San Jose State','5-3',''],['Arkansas','4-4',''],['WKU','5-3',''],['Troy','4-4',''],['Ball State','3-5',''],['NMSU','3-5','']],
+    Sean: [['Oklahoma State','3-5',''],['Nebraska','5-3',''],['Maryland','4-4',''],['Georgia Tech','6-2',''],['TCU','5-3',''],['Air Force','4-4',''],['Old Dominion','5-3',''],['Charlotte','2-6',''],['Hawaii','4-4',''],['Tulsa','3-5','']],
+    Alex: [['Washington','5-3',''],['Kentucky','3-5',''],['Minnesota','5-3',''],['Syracuse','4-4',''],['Boston College','3-5',''],['UAB','3-5',''],['Jacksonville St','4-4',''],['ULM','3-5',''],['Kent State','2-6',''],['FIU','3-5','']],
+    Matt: [['Florida State','3-5',''],['Texas A&M','5-3',''],['West Virginia','3-5',''],['Mississippi St','3-5',''],['Purdue','2-6',''],['Stanford','2-6',''],['South Alabama','4-4',''],['EMU','3-5',''],['CMU','3-5',''],['SDSU','4-4','']],
+  };
+
+  games = [
+    { rankA:'3', teamA:'Georgia', recA:'7-1', scoreA:24, ownA:'Marcus', rankB:'12', teamB:'Ole Miss', recB:'6-2', scoreB:17, ownB:'Marcus', status:'final', clock:'FINAL', note:'+2 MARCUS · RANKED W' },
+    { rankA:'1', teamA:'Ohio State', recA:'8-0', scoreA:31, ownA:'Tyler', rankB:'4', teamB:'Penn State', recB:'7-1', scoreB:24, ownB:'Dan', status:'live', clock:'Q4 · 05:12', note:'' },
+    { rankA:'6', teamA:'Texas', recA:'7-1', scoreA:14, ownA:'Tyler', rankB:'', teamB:'Vanderbilt', recB:'5-3', scoreB:10, ownB:'Tyler', status:'live', clock:'Q2 · 01:58', note:'' },
+    { rankA:'', teamA:'USC', recA:'5-3', scoreA:17, ownA:'Tyler', rankB:'9', teamB:'Notre Dame', recB:'7-1', scoreB:21, ownB:'Chris', status:'live', clock:'Q3 · 08:40', note:'' },
+    { rankA:'', teamA:'Oregon', recA:'6-2', scoreA:38, ownA:'Marcus', rankB:'', teamB:'Wisconsin', recB:'3-5', scoreB:13, ownB:'Brett', status:'final', clock:'FINAL', note:'+1 MARCUS' },
+    { rankA:'', teamA:'Iowa State', recA:'6-2', scoreA:27, ownA:'Marcus', rankB:'18', teamB:'Kansas State', recB:'5-3', scoreB:24, ownB:'Kevin', status:'final', clock:'FINAL', note:'+2 MARCUS · RANKED W' },
+    { rankA:'', teamA:'Louisville', recA:'5-3', scoreA:20, ownA:'Marcus', rankB:'11', teamB:'Miami', recB:'7-1', scoreB:28, ownB:'Dan', status:'final', clock:'FINAL', note:'+1 DAN' },
+    { rankA:'', teamA:'Boise State', recA:'7-1', scoreA:45, ownA:'Tyler', rankB:'', teamB:'Nevada', recB:'3-5', scoreB:21, ownB:'Chris', status:'final', clock:'FINAL', note:'+1 TYLER' },
+    { rankA:'', teamA:'Memphis', recA:'7-1', scoreA:null, ownA:'Marcus', rankB:'', teamB:'Tulane', recB:'6-2', scoreB:null, ownB:'Tyler', status:'up', clock:'SAT · 7:30 PM ET', note:'OWNER H2H' },
+  ];
+
+  baseMessages = [
+    { name:'Marcus', time:'Sat 12:14 PM', text:'Both my teams in the Georgia game today. I literally cannot lose. Study the tape, fellas.' },
+    { name:'Tyler', time:'Sat 12:19 PM', text:'Enjoy it while it lasts. OSU is about to close out Penn State and Texas is cooking Vandy.' },
+    { name:'Jake', time:'Sat 1:02 PM', text:'Vandy hanging around with Texas. Chaos season is upon us.' },
+    { name:'Kevin', time:'Sat 3:47 PM', text:'K-State losing to Iowa State on a last-second FG should be reviewed by the league office.' },
+    { name:'Marcus', time:'Sat 3:52 PM', text:'The league office is me, and the ruling on the field stands. +2, thank you.' },
+    { name:'Dan', time:'Sat 4:10 PM', text:'Miami handled business. Quietly having the best month in this chat.' },
+    { name:'Chris', time:'Sat 4:31 PM', text:'Notre Dame is about to end USC\u2019s whole career. Watch the ticker, Tyler.' },
+    { name:'Sean', time:'Sat 5:05 PM', text:'Someone check on Matt. He hasn\u2019t posted since Florida State kicked off.' },
+    { name:'Matt', time:'Sat 5:06 PM', text:'i\u2019m in shambles' },
+    { name:'Marcus', time:'Sat 5:20 PM', text:'Baller of the Week two weeks straight. Put the plaque on my locker.' },
+  ];
+
+  color(name) {
+    const m = this.managers.find(x => x.name === name);
+    return m ? `oklch(0.78 0.14 ${m.hue})` : '#8B93A6';
+  }
+  initials(name) { return name.slice(0, 2).toUpperCase(); }
+  total(m, thru = 8) { return m.weekly.slice(0, thru).reduce((a, b) => a + b, 0); }
+
+  renderVals() {
+    const tab = this.state.tab ?? this.props.defaultTab ?? 'scoreboard';
+    const setTab = (t) => () => this.setState({ tab: t });
+    const tabDefs = [['scoreboard','SCOREBOARD'],['standings','STANDINGS'],['weeks','PAST SCORES'],['rosters','LOCKER ROOM'],['draft','DRAFT ROOM'],['chat','TRASH TALK']];
+    const tabs = tabDefs.map(([id, label]) => ({
+      label, go: setTab(id),
+      style: {
+        background: 'none', border: 'none', cursor: 'pointer', padding: '14px 16px 12px',
+        fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: '17px', letterSpacing: '2px',
+        color: tab === id ? '#F2B322' : '#8B93A6', borderBottom: tab === id ? '3px solid #F2B322' : '3px solid transparent',
+        whiteSpace: 'nowrap',
+      },
+    }));
+
+    const sorted = [...this.managers].sort((a, b) => this.total(b) - this.total(a));
+    const maxTotal = this.total(sorted[0]);
+    const standings = sorted.map((m, i) => ({
+      rank: i + 1, name: m.name, initials: this.initials(m.name), bg: this.color(m.name),
+      wk: m.weekly[7], rankedWins: m.rankedWins, total: this.total(m),
+      rankColor: i === 0 ? '#F2B322' : '#8B93A6',
+      rowBg: i === 0 ? 'rgba(242,179,34,0.06)' : 'transparent',
+    }));
+
+    const gameStyles = (g) => {
+      const done = g.status !== 'up';
+      const aLead = done && g.scoreA > g.scoreB, bLead = done && g.scoreB > g.scoreA;
+      const nameStyle = (lead) => ({ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: '20px', letterSpacing: '.5px', color: lead || !done ? '#EDEFF4' : '#8B93A6', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' });
+      const scoreStyle = (lead) => ({ marginLeft: 'auto', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: '26px', color: lead ? '#EDEFF4' : '#8B93A6' });
+      return {
+        ...g,
+        scoreA: g.scoreA === null ? '–' : g.scoreA, scoreB: g.scoreB === null ? '–' : g.scoreB,
+        ownerA: g.ownA ? { name: g.ownA, bg: this.color(g.ownA) } : null,
+        ownerB: g.ownB ? { name: g.ownB, bg: this.color(g.ownB) } : null,
+        nameAStyle: nameStyle(aLead), nameBStyle: nameStyle(bLead),
+        scoreAStyle: scoreStyle(aLead || (g.status === 'live' && g.scoreA >= g.scoreB)),
+        scoreBStyle: scoreStyle(bLead || (g.status === 'live' && g.scoreB > g.scoreA)),
+        statusStyle: {
+          fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: '14px', letterSpacing: '1.5px',
+          color: g.status === 'live' ? '#FF6B6B' : g.status === 'up' ? '#8B93A6' : '#B9C0D0',
+          animation: g.status === 'live' ? 'mblPulse 1.6s infinite' : 'none',
+        },
+        noteStyle: {
+          background: g.note.includes('+2') ? 'rgba(242,179,34,0.14)' : '#171B24',
+          border: '1px solid ' + (g.note.includes('+2') ? '#3D3113' : '#232937'),
+          color: g.note.includes('+2') ? '#F2B322' : '#B9C0D0',
+          borderRadius: '999px', padding: '2px 10px', fontSize: '11px', fontWeight: 700, letterSpacing: '1px',
+        },
+      };
+    };
+
+    const wk = this.state.week;
+    const weekChips = [1,2,3,4,5,6,7,8].map(n => ({
+      label: 'WK ' + n, go: () => this.setState({ week: n }),
+      style: {
+        background: wk === n ? '#F2B322' : '#12151C', color: wk === n ? '#07080B' : '#B9C0D0',
+        border: '1px solid ' + (wk === n ? '#F2B322' : '#232937'), borderRadius: '999px', padding: '6px 14px',
+        fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: '14px', letterSpacing: '1.5px', cursor: 'pointer',
+      },
+    }));
+    const wkSorted = [...this.managers].sort((a, b) => b.weekly[wk-1] - a.weekly[wk-1]);
+    const wkMax = wkSorted[0].weekly[wk-1] || 1;
+    const weekRows = wkSorted.map((m, i) => ({
+      rank: i + 1, name: m.name, initials: this.initials(m.name), bg: this.color(m.name),
+      wk: m.weekly[wk-1], cume: this.total(m, wk),
+      rankColor: i === 0 ? '#F2B322' : '#8B93A6',
+      barW: Math.round(m.weekly[wk-1] / wkMax * 100) + '%',
+      barBg: i === 0 ? '#F2B322' : '#39415a',
+    }));
+
+    const rosters = sorted.map(m => ({
+      name: m.name, initials: this.initials(m.name), bg: this.color(m.name), total: this.total(m),
+      teams: this.teamsByManager[m.name].map(([name, rec, rank]) => ({ name, rec, rank })),
+    }));
+
+    const rvA = this.managers[0], rvB = this.managers[1];
+    const rivalry = {
+      title: 'MARCUS vs TYLER', sub: 'The title race — 3 points apart through eight weeks',
+      aName: 'Marcus', bName: 'Tyler', aBg: this.color('Marcus'), bBg: this.color('Tyler'),
+      aTotal: this.total(rvA), bTotal: this.total(rvB),
+      rows: rvA.weekly.map((a, i) => ({
+        label: 'W' + (i+1), aBg: this.color('Marcus'), bBg: this.color('Tyler'),
+        aW: Math.round(a / 10 * 100) + '%', bW: Math.round(rvB.weekly[i] / 10 * 100) + '%',
+      })),
+    };
+
+    const user = this.state.user ?? ((this.props.requireLogin ?? true) ? null : { name: 'Guest' });
+    const isManager = (n) => this.managers.some(x => x.name === n);
+    const messages = [...this.baseMessages, ...this.state.extraMsgs].map(m => ({
+      ...m, initials: this.initials(m.name), bg: isManager(m.name) ? this.color(m.name) : '#F2B322',
+    }));
+    const sendChat = () => {
+      const text = this.state.chatDraft.trim();
+      if (!text) return;
+      this.setState(s => ({ extraMsgs: [...s.extraMsgs, { name: user?.name ?? 'You', time: 'now', text }], chatDraft: '' }));
+    };
+
+    const me = user ? {
+      name: user.name, initials: this.initials(user.name),
+      bg: isManager(user.name) ? this.color(user.name) : '#F2B322',
+    } : null;
+    const doLogin = () => {
+      const email = this.state.loginEmail.trim();
+      if (!email.includes('@') || !this.state.loginPass) { this.setState({ loginErr: 'Enter your email and password.' }); return; }
+      const prefix = email.split('@')[0].toLowerCase();
+      const m = this.managers.find(x => x.name.toLowerCase() === prefix);
+      const name = m ? m.name : prefix.charAt(0).toUpperCase() + prefix.slice(1);
+      this.setState({ user: { name }, loginErr: '', loginPass: '' });
+    };
+
+    // ---- Draft (snake, 10 rounds, teams exclusive) ----
+    const order = this.managers;
+    const basePicks = 26; // rounds 1-2 complete + 4 picks into round 3
+    const totalPicks = basePicks + this.state.extraPicks.length;
+    const roundNum = Math.min(10, Math.floor(totalPicks / 11) + 1);
+    const posInRound = totalPicks % 11;
+    const curIdx = totalPicks >= 110 ? -1 : ((roundNum - 1) % 2 === 0 ? posInRound : 10 - posInRound);
+    const onClock = curIdx >= 0 ? order[curIdx] : null;
+    const cellsByM = order.map(() => []);
+    for (let p = 0; p < totalPicks; p++) {
+      const r = Math.floor(p / 11), pp = p % 11;
+      const mIdx = r % 2 === 0 ? pp : 10 - pp;
+      cellsByM[mIdx][r] = p < basePicks ? this.teamsByManager[order[mIdx].name][r][0] : this.state.extraPicks[p - basePicks].team;
+    }
+    const rows = [];
+    for (let r = 0; r < 10; r++) {
+      rows.push({ n: r + 1, cells: order.map((m, i) => {
+        const t = cellsByM[i][r];
+        const isCur = curIdx === i && r === roundNum - 1 && !t;
+        return {
+          text: t ?? (isCur ? 'ON CLOCK' : ''),
+          style: {
+            padding: '5px 6px', borderRadius: '5px', fontSize: '11px', fontWeight: 600, minHeight: '24px',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center',
+            background: t ? '#171B24' : 'transparent',
+            border: isCur ? '1px solid #F2B322' : t ? '1px solid #232937' : '1px dashed #1A1F2A',
+            color: isCur ? '#F2B322' : '#D6DAE4',
+            letterSpacing: isCur ? '1px' : '0',
+            fontFamily: isCur ? "'Barlow Condensed',sans-serif" : "'Barlow',sans-serif",
+          },
+        };
+      })});
+    }
+    const drafted = new Set(cellsByM.flat().filter(Boolean));
+    const allTeams = [];
+    const seen = new Set();
+    order.forEach(m => this.teamsByManager[m.name].forEach(([name, rec, rank]) => {
+      if (!seen.has(name)) { seen.add(name); allTeams.push({ name, rec, rank }); }
+    }));
+    const q = this.state.q.toLowerCase();
+    const myTurn = !!user && !!onClock && user.name === onClock.name;
+    const pool = allTeams
+      .filter(t => !drafted.has(t.name) && (!q || t.name.toLowerCase().includes(q)))
+      .sort((a, b) => (a.rank && b.rank ? parseInt(a.rank.slice(1)) - parseInt(b.rank.slice(1)) : a.rank ? -1 : b.rank ? 1 : a.name.localeCompare(b.name)))
+      .map(t => ({ ...t,
+        pick: () => { if (myTurn) this.setState(s => ({ extraPicks: [...s.extraPicks, { team: t.name }], clock: 90 })); },
+        btnStyle: {
+          background: myTurn ? '#F2B322' : '#171B24', color: myTurn ? '#07080B' : '#4A5163',
+          border: '1px solid ' + (myTurn ? '#F2B322' : '#232937'), borderRadius: '6px', padding: '4px 10px',
+          fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: '12px', letterSpacing: '1.5px',
+          cursor: myTurn ? 'pointer' : 'default',
+        },
+      }));
+    const clk = this.state.clock;
+    const draft = {
+      round: roundNum, pickNo: totalPicks + 1,
+      clockStr: Math.floor(clk / 60) + ':' + String(clk % 60).padStart(2, '0'),
+      clockStyle: {
+        fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: '30px', marginLeft: '6px',
+        color: clk <= 15 ? '#FF6B6B' : '#EDEFF4', animation: clk <= 15 ? 'mblPulse 1s infinite' : 'none',
+      },
+      onClockName: onClock ? onClock.name.toUpperCase() : 'DRAFT COMPLETE',
+      onClockInitials: onClock ? this.initials(onClock.name) : '—',
+      onClockBg: onClock ? this.color(onClock.name) : '#232937',
+      myTurn,
+      cols: order.map(m => ({ name: m.name, initials: this.initials(m.name), bg: this.color(m.name) })),
+      rows, pool, poolCount: pool.length,
+      q: this.state.q, onQ: (e) => this.setState({ q: e.target.value }),
+    };
+
+    return {
+      tabs,
+      loggedIn: !!user, loggedOut: !user, me, draft,
+      signOut: () => this.setState({ user: null, tab: null }),
+      loginEmail: this.state.loginEmail, loginPass: this.state.loginPass, loginErr: this.state.loginErr,
+      onLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
+      onLoginPass: (e) => this.setState({ loginPass: e.target.value }),
+      onLoginKey: (e) => { if (e.key === 'Enter') doLogin(); },
+      doLogin,
+      skipLogin: () => this.setState({ user: { name: 'Guest' } }),
+      isScoreboard: tab === 'scoreboard', isStandings: tab === 'standings', isWeeks: tab === 'weeks',
+      isRosters: tab === 'rosters', isChat: tab === 'chat', isDraft: tab === 'draft',
+      showTicker: this.props.showTicker ?? true,
+      showBaller: this.props.showBaller ?? true,
+      tickerItems: [
+        'FINAL · GEORGIA 24, OLE MISS 17', 'Q4 · OHIO STATE 31, PENN STATE 24', 'Q2 · TEXAS 14, VANDERBILT 10',
+        'Q3 · NOTRE DAME 21, USC 17', 'FINAL · OREGON 38, WISCONSIN 13', 'FINAL · IOWA STATE 27, KANSAS STATE 24',
+        'FINAL · MIAMI 28, LOUISVILLE 20', 'FINAL · BOISE STATE 45, NEVADA 21', 'TONIGHT · MEMPHIS AT TULANE 7:30 ET',
+        'FINAL · GEORGIA 24, OLE MISS 17', 'Q4 · OHIO STATE 31, PENN STATE 24', 'Q2 · TEXAS 14, VANDERBILT 10',
+        'Q3 · NOTRE DAME 21, USC 17', 'FINAL · OREGON 38, WISCONSIN 13', 'FINAL · IOWA STATE 27, KANSAS STATE 24',
+        'FINAL · MIAMI 28, LOUISVILLE 20', 'FINAL · BOISE STATE 45, NEVADA 21', 'TONIGHT · MEMPHIS AT TULANE 7:30 ET',
+      ],
+      baller: { name: 'MARCUS', initials: 'MA', bg: this.color('Marcus'), pts: 10,
+        blurb: 'Went 8-2 with two ranked wins in Week 8 — back-to-back Baller honors.' },
+      games: this.games.map(g => gameStyles(g)),
+      standings, weekChips, weekRows, rosters, rivalry, messages,
+      chatDraft: this.state.chatDraft,
+      onDraft: (e) => this.setState({ chatDraft: e.target.value }),
+      onDraftKey: (e) => { if (e.key === 'Enter') sendChat(); },
+      sendChat,
+    };
+  }
+}
+</script>
+</body>
+</html>

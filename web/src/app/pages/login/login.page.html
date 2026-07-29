@@ -1,0 +1,26 @@
+<div class="login-wrap">
+  <form class="login-card" (ngSubmit)="signIn()">
+    <span class="logo-tile">MB</span>
+    <h1 class="title">Sign in to the League</h1>
+
+    <label class="mbl-label" for="email">Email</label>
+    <input class="mbl-input" id="email" name="email" type="email" [(ngModel)]="email" autocomplete="email" />
+
+    <label class="mbl-label" for="password">Password</label>
+    <input
+      class="mbl-input"
+      id="password"
+      name="password"
+      type="password"
+      [(ngModel)]="password"
+      autocomplete="current-password"
+    />
+
+    @if (error(); as message) {
+      <p class="error">{{ message }}</p>
+    }
+
+    <button class="mbl-btn-primary" type="submit" [disabled]="busy()">Sign In</button>
+    <button class="mbl-btn-outline" type="button" (click)="browseAsGuest()">Browse Without Signing In</button>
+  </form>
+</div>

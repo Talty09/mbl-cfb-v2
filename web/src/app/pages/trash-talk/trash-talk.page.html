@@ -1,0 +1,42 @@
+<div class="chat-wrap">
+  <div class="chat-card">
+    <div class="chat-head">
+      <h1 class="chat-title">The Trash Talk</h1>
+      <span class="mbl-label">11 ballers · no refs</span>
+    </div>
+
+    <div class="message-list">
+      @for (message of messages(); track message.id) {
+        <div class="message">
+          <span class="avatar" [style.background]="avatarColor(message.user.avatarHue)">
+            {{ initials(message.user.displayName) }}
+          </span>
+          <div class="message-body">
+            <div class="message-meta">
+              <span class="author">{{ message.user.displayName }}</span>
+              <span class="timestamp">{{ message.createdAt.slice(0, 16).replace('T', ' ') }}</span>
+            </div>
+            <div class="bubble">{{ message.body }}</div>
+          </div>
+        </div>
+      } @empty {
+        <p class="mbl-label empty">No trash talked yet. Someone has to start it.</p>
+      }
+    </div>
+
+    @if (auth.isSignedIn()) {
+      <form class="composer" (ngSubmit)="send()">
+        <input
+          class="mbl-input"
+          name="draft"
+          [(ngModel)]="draft"
+          placeholder="Say something you'll regret…"
+          autocomplete="off"
+        />
+        <button class="mbl-btn-primary send-btn" type="submit" [disabled]="sending()">Send</button>
+      </form>
+    } @else {
+      <p class="signin-note mbl-label"><a routerLink="/login">Sign in</a> to talk trash</p>
+    }
+  </div>
+</div>

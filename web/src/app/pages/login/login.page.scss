@@ -1,0 +1,45 @@
+.login-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--mbl-surface);
+  border: 1px solid var(--mbl-border);
+  border-radius: 12px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.logo-tile {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  background: var(--mbl-gold);
+  color: var(--mbl-bg-deep);
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 30px;
+  border-radius: 8px;
+}
+
+.title {
+  font-size: 26px;
+  margin: 8px 0 12px;
+}
+
+.error {
+  color: var(--mbl-red);
+  margin: 0;
+  font-size: 13px;
+}
+
+.mbl-btn-primary {
+  margin-top: 8px;
+}
