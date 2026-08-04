@@ -4,6 +4,7 @@ import type { Meta } from 'shared';
 import { ApiService } from './core/api.service';
 import { AuthService } from './core/auth.service';
 import { PulseService } from './core/pulse.service';
+import { StaleChunkService } from './core/stale-chunk.service';
 import { CURRENT_SEASON, avatarColor, initials } from './core/models';
 
 @Component({
@@ -17,6 +18,7 @@ export class App {
   private api = inject(ApiService);
   protected auth = inject(AuthService);
   protected pulse = inject(PulseService);
+  private staleChunks = inject(StaleChunkService);
 
   protected readonly avatarColor = avatarColor;
   protected readonly initials = initials;
@@ -54,6 +56,9 @@ export class App {
   ];
 
   constructor() {
+    // Before anything else: a tab left open across a deploy has stale chunk
+    // names, and without this every nav click would silently do nothing.
+    this.staleChunks.start();
     this.pulse.start();
     void this.loadMeta();
 
