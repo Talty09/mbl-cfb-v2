@@ -1,0 +1,109 @@
+<div class="standings-grid">
+  <section class="table-card">
+    <header class="card-head">
+      <h1>Season Standings</h1>
+      <span class="through">{{ throughLabel() }}</span>
+    </header>
+
+    <div class="row head-row">
+      <span>Rk</span>
+      <span>Manager</span>
+      <span class="num">{{ weekColumn() }}</span>
+      <span class="num" title="Wins over an AP Top 25 opponent">Ranked</span>
+      <span class="num">Total</span>
+    </div>
+
+    @for (row of rows(); track row.user.id) {
+      <div class="row body-row" [class.leader]="isLeader(row)">
+        <span class="rank">{{ row.rank }}</span>
+        <span class="manager">
+          <span class="avatar" [style.background]="avatarColor(row.user.avatarHue)">
+            {{ initials(row.user.displayName) }}
+          </span>
+          <span class="name">{{ row.user.displayName }}</span>
+        </span>
+        <span class="num wk">{{ row.weekPoints }}</span>
+        <span class="num ranked">{{ row.rankedWins }}</span>
+        <span class="num"><span class="total">{{ row.total }}</span></span>
+      </div>
+    } @empty {
+      <p class="empty mbl-label">
+        {{ loaded() ? 'No managers in the league yet.' : 'Loading standings…' }}
+      </p>
+    }
+  </section>
+
+  <section class="mbl-card rivalry">
+    <span class="rivalry-label">Rivalry Watch</span>
+
+    @if (rivalry(); as pair) {
+      <h2 class="rivalry-title">{{ pair.a.user.displayName }} vs {{ pair.b.user.displayName }}</h2>
+      <p class="rivalry-sub">{{ rivalrySub() }}</p>
+
+      <div class="rivalry-pick">
+        <select class="pick" aria-label="Left manager" (change)="chooseA($event)">
+          @for (row of rows(); track row.user.id) {
+            <option [value]="row.user.id" [selected]="row.user.id === pair.a.user.id">
+              {{ row.user.displayName }}
+            </option>
+          }
+        </select>
+        <select class="pick" aria-label="Right manager" (change)="chooseB($event)">
+          @for (row of rows(); track row.user.id) {
+            <option [value]="row.user.id" [selected]="row.user.id === pair.b.user.id">
+              {{ row.user.displayName }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="legend">
+        <span class="side">
+          <span class="swatch" [style.background]="avatarColor(pair.a.user.avatarHue)"></span>
+          {{ pair.a.user.displayName }}
+        </span>
+        <span class="side">
+          {{ pair.b.user.displayName }}
+          <span class="swatch" [style.background]="avatarColor(pair.b.user.avatarHue)"></span>
+        </span>
+      </div>
+
+      @if (rivalryWeeks().length) {
+        <div class="chart">
+          <!-- Postseason weeks reuse regular-season numbers, so labels repeat. -->
+          @for (week of rivalryWeeks(); track $index) {
+            <div class="chart-row" [title]="week.title">
+              <span class="chart-side left">
+                <span
+                  class="bar"
+                  [style.width.%]="week.aWidth"
+                  [style.background]="avatarColor(pair.a.user.avatarHue)"
+                ></span>
+              </span>
+              <span class="chart-week">{{ week.label }}</span>
+              <span class="chart-side">
+                <span
+                  class="bar"
+                  [style.width.%]="week.bWidth"
+                  [style.background]="avatarColor(pair.b.user.avatarHue)"
+                ></span>
+              </span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="chart-empty">The chart fills in week by week, once games go final.</p>
+      }
+
+      <div class="totals">
+        <span class="total-num">{{ pair.a.total }}</span>
+        <span class="totals-label">Season pts</span>
+        <span class="total-num">{{ pair.b.total }}</span>
+      </div>
+    } @else {
+      <p class="chart-empty">
+        {{ loaded() ? 'A rivalry needs two managers.' : 'Loading…' }}
+      </p>
+    }
+  </section>
+</div>

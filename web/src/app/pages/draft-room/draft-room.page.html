@@ -1,0 +1,162 @@
+@if (state(); as draft) {
+  <section class="draft-head">
+    <div class="head-left">
+      <span class="mbl-label kicker">Live draft · snake format</span>
+      <h1 class="draft-title">{{ headline() }}</h1>
+    </div>
+
+    @if (draft.onClockUser; as onClock) {
+      <!-- Where the handoff had a 90s countdown: same card, elapsed time instead. -->
+      <div class="clock-card">
+        <span class="avatar clock-avatar" [style.background]="avatarColor(onClock.avatarHue)">
+          {{ initials(onClock.displayName) }}
+        </span>
+        <div class="clock-who">
+          <span class="mbl-label">On the clock</span>
+          <span class="clock-name">{{ onClock.displayName }}</span>
+        </div>
+        <span class="clock-elapsed">{{ onClockFor() }}</span>
+      </div>
+    }
+  </section>
+
+  @if (myTurn()) {
+    <p class="banner">You are on the clock — make your pick from the available teams</p>
+  } @else if (proxyBanner(); as target) {
+    <p class="banner proxy">
+      Picking on behalf of {{ target.displayName }} — choose their team below
+    </p>
+  }
+
+  @if (statusNote(); as note) {
+    <p class="note">{{ note }}</p>
+  }
+
+  @if (error(); as message) {
+    <p class="error" role="status">{{ message }}</p>
+  }
+
+  @if (isCommissioner()) {
+    <div class="commish" role="group" aria-label="Commissioner controls">
+      <span class="mbl-label commish-label">Commissioner</span>
+
+      @if (draft.draftStatus === 'active') {
+        <button class="mbl-btn-outline commish-btn" type="button" (click)="setStatus('complete')">
+          Complete draft
+        </button>
+      } @else {
+        <button class="mbl-btn-outline commish-btn" type="button" (click)="setStatus('active')">
+          {{ draft.draftStatus === 'pending' ? 'Open draft' : 'Reopen draft' }}
+        </button>
+      }
+
+      @if (proxyTarget(); as target) {
+        <button
+          class="mbl-btn-outline commish-btn"
+          type="button"
+          [class.armed]="proxying()"
+          (click)="proxying.set(!proxying())"
+        >
+          {{ proxying() ? 'Stop picking for ' : 'Pick for ' }}{{ target.displayName }}
+        </button>
+      }
+
+      @if (orderLocked()) {
+        <span class="mbl-label commish-note">Order locked — picks made</span>
+      } @else {
+        <button class="mbl-btn-outline commish-btn" type="button" (click)="randomizeOrder()">
+          {{ confirmRandomize() ? 'Confirm randomize' : 'Randomize order' }}
+        </button>
+      }
+    </div>
+  }
+
+  <div class="draft-body">
+    <div class="mbl-card board-panel">
+      @if (draft.order.length === 0) {
+        <p class="empty mbl-label">No draft order yet, so there is no board to show.</p>
+      } @else {
+        <div class="board-scroll">
+          <div class="board" [style.gridTemplateColumns]="gridColumns()">
+            <span class="corner"></span>
+            @for (manager of draft.order; track manager.id) {
+              <span
+                class="head-cell"
+                [class.on-clock]="manager.id === draft.onClockUser?.id"
+                [title]="manager.displayName"
+              >
+                <span class="avatar" [style.background]="avatarColor(manager.avatarHue)">
+                  {{ initials(manager.displayName) }}
+                </span>
+              </span>
+            }
+
+            @for (row of board(); track row.round) {
+              <span class="row-label">R{{ row.round }}</span>
+              @for (cell of row.cells; track cell.slot) {
+                @if (cell.pick; as pick) {
+                  <span class="cell filled" [title]="cellTitle(pick)">
+                    {{ pick.team.school }}
+                    @if (pick.madeByCommissioner) {
+                      <span class="commish-mark" aria-hidden="true">·</span>
+                    }
+                  </span>
+                } @else if (cell.onClock) {
+                  <span class="cell live">On clock</span>
+                } @else {
+                  <span class="cell future"></span>
+                }
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="mbl-card pool-panel">
+      <h2 class="pool-title">Available Teams ({{ pool().length }})</h2>
+
+      <input
+        class="mbl-input search"
+        type="search"
+        placeholder="Search teams…"
+        aria-label="Search available teams"
+        autocomplete="off"
+        [value]="search()"
+        (input)="onSearch($event)"
+      />
+
+      <div class="pool-list">
+        @for (team of filteredPool(); track team.id) {
+          <div class="pool-row">
+            <span class="rank">{{ team.rank ?? '' }}</span>
+            <span class="school">{{ team.school }}</span>
+            <span class="record">{{ team.wins }}-{{ team.losses }}</span>
+            @if (draftable()) {
+              <button
+                class="draft-btn"
+                type="button"
+                [disabled]="!canPick() || busyTeamId() !== null"
+                (click)="pick(team)"
+              >
+                Draft
+              </button>
+            }
+          </div>
+        } @empty {
+          <p class="empty mbl-label">
+            {{ pool().length === 0 ? 'Every team is drafted.' : 'No teams match that search.' }}
+          </p>
+        }
+      </div>
+
+      @if (draftable() && !auth.isSignedIn()) {
+        <p class="pool-note mbl-label"><a routerLink="/login">Sign in</a> to draft</p>
+      }
+    </div>
+  </div>
+} @else if (loading()) {
+  <p class="mbl-label">Loading the draft…</p>
+} @else {
+  <p class="error" role="status">The draft could not be loaded. It will retry shortly.</p>
+}

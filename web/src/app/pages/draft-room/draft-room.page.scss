@@ -1,0 +1,303 @@
+.draft-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.kicker {
+  color: var(--mbl-red);
+  letter-spacing: 3px;
+}
+
+.draft-title {
+  margin: 2px 0 0;
+  font-size: 26px;
+}
+
+.clock-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--mbl-surface);
+  border: 1px solid var(--mbl-border);
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+
+.avatar {
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--mbl-bg-deep);
+  font-weight: 700;
+  font-size: 11px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.clock-avatar {
+  width: 34px;
+  height: 34px;
+  font-size: 13px;
+}
+
+.clock-who {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.clock-name {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+// Holds the countdown's visual weight without implying a deadline.
+.clock-elapsed {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--mbl-text-2);
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.banner {
+  margin: 14px 0 0;
+  background: var(--mbl-gold-tint);
+  border: 1px solid var(--mbl-border);
+  border-left: 3px solid var(--mbl-gold);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--mbl-gold);
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.banner.proxy {
+  color: var(--mbl-text-2);
+  border-left-color: var(--mbl-border-hover);
+  background: var(--mbl-chip);
+}
+
+.note {
+  margin: 14px 0 0;
+  color: var(--mbl-muted);
+}
+
+.error {
+  margin: 14px 0 0;
+  color: var(--mbl-red);
+}
+
+.commish {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--mbl-well);
+  border: 1px solid var(--mbl-divider);
+  border-radius: 8px;
+}
+
+.commish-label {
+  margin-right: 4px;
+}
+
+.commish-btn {
+  padding: 7px 12px;
+  font-size: 13px;
+
+  &.armed {
+    border-color: var(--mbl-gold);
+    color: var(--mbl-gold);
+  }
+}
+
+.commish-note {
+  color: var(--mbl-disabled);
+}
+
+.draft-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 18px;
+}
+
+.board-panel {
+  flex: 2 1 480px;
+  min-width: 0;
+}
+
+// The board itself has a floor of 860px, so the panel scrolls rather than
+// squeezing eleven columns into a phone.
+.board-scroll {
+  overflow-x: auto;
+}
+
+.board {
+  display: grid;
+  gap: 4px;
+  min-width: 860px;
+}
+
+.head-cell {
+  display: grid;
+  place-items: center;
+  padding: 4px 0;
+  border-radius: 6px;
+
+  &.on-clock {
+    background: var(--mbl-gold-tint);
+  }
+}
+
+.row-label {
+  display: grid;
+  place-items: center;
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--mbl-muted);
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  padding: 6px 4px;
+  font-size: 12px;
+  text-align: center;
+  min-height: 28px;
+  // Without this the school name sets the column's min-content width, so long
+  // names ("Ohio State", "Penn State") push the grid past its 70px-per-column
+  // floor and eleven managers no longer fit — the board scrolled sideways on a
+  // desktop that had room for it. Truncate instead; the full name is in the
+  // cell's title attribute.
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cell.filled {
+  background: var(--mbl-chip);
+  border: 1px solid var(--mbl-border);
+  color: var(--mbl-text);
+}
+
+// A pick the commissioner entered for someone; the tooltip carries the detail.
+.commish-mark {
+  color: var(--mbl-muted);
+}
+
+.cell.live {
+  border: 1px solid var(--mbl-gold);
+  color: var(--mbl-gold);
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cell.future {
+  border: 1px dashed var(--mbl-divider);
+}
+
+.pool-panel {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.pool-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.search {
+  margin-bottom: 10px;
+  padding: 9px 12px;
+}
+
+.pool-list {
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.pool-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--mbl-divider);
+}
+
+.rank {
+  color: var(--mbl-gold);
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-align: right;
+}
+
+.school {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record {
+  color: var(--mbl-muted);
+  font-size: 12px;
+}
+
+.draft-btn {
+  background: var(--mbl-gold);
+  color: var(--mbl-bg-deep);
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--mbl-gold-hover);
+  }
+
+  &:disabled {
+    background: var(--mbl-chip);
+    color: var(--mbl-disabled);
+    cursor: default;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 28px 0;
+}
+
+.pool-note {
+  border-top: 1px solid var(--mbl-divider);
+  margin: 0;
+  padding-top: 10px;
+  text-align: center;
+}

@@ -1,95 +1,70 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { CURRENT_SEASON, Manager, avatarColor, initials } from '../../core/models';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { DRAFT_ROUNDS, type RosterCard } from 'shared';
+import { ApiService } from '../../core/api.service';
+import { PulseService } from '../../core/pulse.service';
+import { avatarColor, initials } from '../../core/models';
 
-/**
- * Locker Room: each manager's 10 drafted teams as chips.
- * Data: /api/users?season=YYYY (rosters) + /api/teams/fbs for names/ranks.
- */
 @Component({
   selector: 'app-locker-room-page',
-  template: `
-    <h1>Locker Room</h1>
-    <div class="roster-grid">
-      @for (manager of managers(); track manager.id) {
-        <div class="mbl-card">
-          <div class="card-head">
-            <span class="avatar" [style.background]="avatarColor(manager.avatarHue)">
-              {{ initials(manager.displayName) }}
-            </span>
-            <span class="name">{{ manager.displayName }}</span>
-          </div>
-          @if (manager.rosterSpots.length > 0) {
-            <div class="chips">
-              @for (spot of manager.rosterSpots; track spot.teamId) {
-                <!-- TODO: resolve teamId to name/rank via /api/teams/fbs -->
-                <span class="team-chip">Team #{{ spot.teamId }}</span>
-              }
-            </div>
-          } @else {
-            <p class="mbl-label">No roster yet — see you in the draft room</p>
-          }
-        </div>
-      } @empty {
-        <div class="mbl-card">
-          <p class="mbl-label">No managers loaded</p>
-          <p>Start the server and seed the database (see server/README notes in CLAUDE.md).</p>
-        </div>
-      }
-    </div>
-  `,
-  styles: `
-    .roster-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-      gap: 14px;
-    }
-    .card-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      color: var(--mbl-bg-deep);
-      font-weight: 700;
-      font-size: 12px;
-    }
-    .name {
-      font-family: var(--mbl-font-display);
-      font-weight: 800;
-      font-size: 20px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .team-chip {
-      background: var(--mbl-chip);
-      border: 1px solid var(--mbl-border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 13px;
-    }
-  `,
+  templateUrl: './locker-room.page.html',
+  styleUrl: './locker-room.page.scss',
 })
 export class LockerRoomPage {
-  private http = inject(HttpClient);
+  private api = inject(ApiService);
+  private pulse = inject(PulseService);
 
   protected readonly avatarColor = avatarColor;
   protected readonly initials = initials;
+  protected readonly rounds = DRAFT_ROUNDS;
 
-  protected readonly managers = toSignal(
-    this.http.get<Manager[]>(`/api/users?season=${CURRENT_SEASON}`),
-    { initialValue: [] as Manager[] },
+  private readonly cards = signal<RosterCard[]>([]);
+  /** Separates "still loading" from "the league is genuinely empty". */
+  protected readonly loaded = signal(false);
+
+  /**
+   * Leaderboard order, like the standings and the design mock. Before anyone has
+   * scored every total is 0, so the name tiebreak is what actually orders the
+   * grid for most of the preseason — which is why it isn't just decoration.
+   */
+  protected readonly rosters = computed(() =>
+    [...this.cards()].sort(
+      (a, b) => b.total - a.total || a.user.displayName.localeCompare(b.user.displayName),
+    ),
   );
+
+  constructor() {
+    // Two counters move a roster card: a pick changes who owns what, and an
+    // ingest changes what those teams have earned.
+    effect(() => {
+      this.pulse.pickCount();
+      this.pulse.lastSyncAt();
+      void this.load();
+    });
+  }
+
+  private async load(): Promise<void> {
+    try {
+      this.cards.set(await this.api.rosters());
+    } catch {
+      // Keep the last good grid; the next pulse tick retries.
+    } finally {
+      this.loaded.set(true);
+    }
+  }
+
+  /** Teams a manager still has coming, so a half-finished draft reads as such. */
+  protected picksRemaining(card: RosterCard): number {
+    return Math.max(0, DRAFT_ROUNDS - card.teams.length);
+  }
+
+  /**
+   * Ranked teams first, then alphabetical. `/api/rosters` groups by team id and
+   * so has no meaningful order of its own; this at least makes the chips stable
+   * between loads and leads with the names people look for.
+   */
+  protected orderedTeams(card: RosterCard): RosterCard['teams'] {
+    return [...card.teams].sort(
+      (a, b) => (a.rank ?? 999) - (b.rank ?? 999) || a.school.localeCompare(b.school),
+    );
+  }
 }

@@ -1,0 +1,66 @@
+<div class="week-head">
+  <h1>Past Scores</h1>
+  <div class="chips">
+    @for (week of weeks(); track week) {
+      <button
+        class="chip"
+        type="button"
+        [class.selected]="week === selectedWeek()"
+        [attr.aria-pressed]="week === selectedWeek()"
+        (click)="selectedWeek.set(week)"
+      >
+        WK {{ week }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (weeks().length === 0) {
+  <div class="mbl-card empty-card">
+    <p class="mbl-label">No weeks played yet</p>
+    <p class="empty-note">
+      @if (loaded()) {
+        The {{ season() ?? '' }} season hasn't kicked off. Week-by-week scores land here as games
+        go final.
+      } @else {
+        Loading the season calendar…
+      }
+    </p>
+  </div>
+} @else {
+  <section class="table-card">
+    <div class="row head-row">
+      <span>Rk</span>
+      <span>Manager</span>
+      <span>Week score</span>
+      <span class="num">Pts</span>
+      <span class="num">Season</span>
+    </div>
+
+    @for (row of rows(); track row.user.id) {
+      <div class="row body-row">
+        <span class="rank" [class.leader]="isLeader(row)">{{ row.rank }}</span>
+        <span class="manager">
+          <span class="avatar" [style.background]="avatarColor(row.user.avatarHue)">
+            {{ initials(row.user.displayName) }}
+          </span>
+          <span class="name">{{ row.user.displayName }}</span>
+        </span>
+        <span class="bar-cell">
+          <span class="bar" [class.leader]="isLeader(row)" [style.width.%]="barWidth(row)"></span>
+        </span>
+        <span class="num pts">{{ row.weekPoints }}</span>
+        <span class="num season">{{ row.seasonTotal }}</span>
+      </div>
+    } @empty {
+      <p class="empty mbl-label">Loading week {{ selectedWeek() }}…</p>
+    }
+
+    @if (weekIsBlank()) {
+      <p class="blank-note">
+        No points scored in week {{ selectedWeek() }} — either no games are final yet, or no owned
+        team won.
+      </p>
+    }
+  </section>
+}

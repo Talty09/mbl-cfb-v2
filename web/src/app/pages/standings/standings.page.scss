@@ -1,0 +1,268 @@
+.standings-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+// The table needs the width more than the rivalry panel does.
+@media (max-width: 900px) {
+  .standings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.table-card {
+  background: var(--mbl-surface);
+  border: 1px solid var(--mbl-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--mbl-border);
+
+  h1 {
+    margin: 0;
+    font-size: 22px;
+  }
+}
+
+.through {
+  color: var(--mbl-muted);
+  font-size: 13px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 60px 60px 90px;
+  gap: 0 8px;
+  align-items: center;
+  padding: 11px 18px;
+}
+
+.head-row {
+  padding: 10px 18px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--mbl-muted);
+}
+
+.body-row {
+  border-top: 1px solid var(--mbl-divider);
+
+  &.leader {
+    background: var(--mbl-gold-tint);
+
+    .rank {
+      color: var(--mbl-gold);
+    }
+  }
+}
+
+.num {
+  text-align: right;
+}
+
+.rank {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--mbl-muted);
+}
+
+.manager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--mbl-bg-deep);
+}
+
+.name {
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wk {
+  font-weight: 600;
+  color: var(--mbl-text-2);
+}
+
+.ranked {
+  font-weight: 600;
+  color: var(--mbl-gold);
+}
+
+.total {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.empty {
+  padding: 28px 18px;
+  margin: 0;
+  text-align: center;
+}
+
+.rivalry {
+  padding: 16px 18px;
+}
+
+.rivalry-label {
+  display: block;
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--mbl-red);
+  margin-bottom: 4px;
+}
+
+.rivalry-title {
+  margin: 0 0 2px;
+  font-size: 24px;
+  letter-spacing: 1px;
+}
+
+.rivalry-sub {
+  margin: 0 0 12px;
+  color: var(--mbl-muted);
+  font-size: 13px;
+}
+
+.rivalry-pick {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.pick {
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--mbl-well);
+  border: 1px solid var(--mbl-border);
+  border-radius: 6px;
+  padding: 5px 6px;
+  color: var(--mbl-text-2);
+  font-family: var(--mbl-font-body);
+  font-size: 12px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--mbl-gold);
+  }
+}
+
+.legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mbl-text-2);
+  margin-bottom: 8px;
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr 44px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-side {
+  display: flex;
+}
+
+// Left-hand bars grow inward toward the week label, mirroring the right side.
+.left {
+  justify-content: flex-end;
+}
+
+.bar {
+  height: 12px;
+  border-radius: 3px;
+}
+
+.chart-week {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mbl-muted);
+}
+
+.chart-empty {
+  margin: 0;
+  color: var(--mbl-muted);
+  font-size: 13px;
+}
+
+.totals {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--mbl-border);
+}
+
+.total-num {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 30px;
+}
+
+.totals-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--mbl-muted);
+}

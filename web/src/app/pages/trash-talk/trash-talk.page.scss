@@ -13,20 +13,42 @@
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  padding: 16px;
 }
 
 .chat-head {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
-  border-bottom: 1px solid var(--mbl-divider);
-  padding-bottom: 10px;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--mbl-border);
+  padding: 14px 18px;
 }
 
 .chat-title {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
+}
+
+.chat-sub {
+  color: var(--mbl-muted);
+  font-size: 13px;
+}
+
+.online {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mbl-green);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mbl-green);
 }
 
 .message-list {
@@ -35,12 +57,13 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 14px 0;
+  padding: 16px 18px;
 }
 
 .message {
   display: flex;
   gap: 10px;
+  align-items: flex-start;
 }
 
 .avatar {
@@ -51,20 +74,24 @@
   display: grid;
   place-items: center;
   color: var(--mbl-bg-deep);
-  font-weight: 700;
-  font-size: 12px;
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.message-body {
+  min-width: 0;
 }
 
 .message-meta {
   display: flex;
   gap: 8px;
   align-items: baseline;
-  margin-bottom: 4px;
 }
 
 .author {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .timestamp {
@@ -73,33 +100,45 @@
 }
 
 .bubble {
+  margin-top: 3px;
   background: var(--mbl-chip);
   border: 1px solid var(--mbl-border);
   border-radius: 4px 12px 12px 12px;
   padding: 8px 12px;
   font-size: 14px;
+  color: var(--mbl-text-2);
   width: fit-content;
+  // A pasted URL or a one-word rant must not widen the card.
+  overflow-wrap: anywhere;
 }
 
 .empty {
   text-align: center;
-  margin-top: 40px;
+  margin: auto 0;
 }
 
 .composer {
   display: flex;
   gap: 10px;
-  border-top: 1px solid var(--mbl-divider);
-  padding-top: 12px;
+  border-top: 1px solid var(--mbl-border);
+  padding: 12px 14px;
 }
 
 .send-btn {
-  padding: 0 24px;
+  padding: 0 22px;
   font-size: 16px;
+  letter-spacing: 1.5px;
+}
+
+.send-error {
+  margin: 0;
+  padding: 0 14px 12px;
+  color: var(--mbl-red);
+  font-size: 12px;
 }
 
 .signin-note {
-  border-top: 1px solid var(--mbl-divider);
-  padding-top: 12px;
+  border-top: 1px solid var(--mbl-border);
+  padding: 14px;
   text-align: center;
 }

@@ -1,0 +1,101 @@
+@if (baller(); as baller) {
+  <section class="baller">
+    <span class="baller-avatar" [style.background]="avatarColor(baller.user.avatarHue)">
+      {{ initials(baller.user.displayName) }}
+    </span>
+    <div class="baller-body">
+      <span class="baller-label mbl-label">
+        Baller of the Week @if (week() !== null) { · Week {{ week() }} }
+      </span>
+      <h2 class="baller-name">{{ baller.user.displayName }}</h2>
+      <p class="baller-blurb">{{ ballerBlurb() }}</p>
+    </div>
+    <div class="baller-points">
+      <span class="baller-number">{{ baller.points }}</span>
+      <span class="mbl-label">Points</span>
+    </div>
+  </section>
+}
+
+<div class="board-head">
+  <div>
+    <h1 class="board-title">{{ heading() }}</h1>
+    <!-- No point values here: the rules live on the server. -->
+    <p class="board-note mbl-label">Wins score — ranked, bowl and playoff wins score more</p>
+  </div>
+
+  @if (canStepWeeks()) {
+    <div class="week-step">
+      <button
+        class="step-btn"
+        type="button"
+        (click)="step(-1)"
+        [disabled]="!canStepBack()"
+        aria-label="Previous week"
+      >
+        ‹
+      </button>
+      <button
+        class="step-btn"
+        type="button"
+        (click)="step(1)"
+        [disabled]="!canStepForward()"
+        aria-label="Next week"
+      >
+        ›
+      </button>
+      @if (offCurrentWeek()) {
+        <button class="current-btn" type="button" (click)="showCurrentWeek()">This week</button>
+      }
+    </div>
+  }
+</div>
+
+@if (failed()) {
+  <p class="load-error" role="status">Could not reach the scoreboard — showing the last update.</p>
+}
+
+@if (cards().length > 0) {
+  <div class="game-grid">
+    @for (card of cards(); track card.id) {
+      <article class="mbl-card game">
+        <div class="game-top">
+          <span
+            class="status"
+            [class.status-live]="card.status === 'live'"
+            [class.status-final]="card.status === 'final'"
+            [class.status-upcoming]="card.status === 'upcoming'"
+            >{{ card.statusLabel }}</span
+          >
+          @if (card.note; as note) {
+            <span class="note" [class.note-highlight]="note.highlight">{{ note.text }}</span>
+          }
+        </div>
+
+        @for (team of card.rows; track $index) {
+          <div class="team" [class.dimmed]="team.dimmed">
+            <span class="rank">{{ team.rank ?? '' }}</span>
+            <span class="school">{{ team.school }}</span>
+            @if (team.record) {
+              <span class="record">{{ team.record }}</span>
+            }
+            @if (team.owner; as owner) {
+              <span class="owner">
+                <span class="owner-dot" [style.background]="avatarColor(owner.avatarHue)"></span>
+                {{ owner.displayName }}
+              </span>
+            }
+            <span class="score">{{ team.score }}</span>
+          </div>
+        }
+      </article>
+    }
+  </div>
+} @else if (loading()) {
+  <p class="board-empty mbl-label">Loading games…</p>
+} @else {
+  <div class="mbl-card board-empty">
+    <p class="mbl-label">No games</p>
+    <p>{{ emptyMessage() }}</p>
+  </div>
+}

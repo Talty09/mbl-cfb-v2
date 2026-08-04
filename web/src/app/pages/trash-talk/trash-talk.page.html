@@ -1,40 +1,46 @@
 <div class="chat-wrap">
   <div class="chat-card">
     <div class="chat-head">
-      <h1 class="chat-title">The Trash Talk</h1>
-      <span class="mbl-label">11 ballers · no refs</span>
+      <h2 class="chat-title">The Trash Talk</h2>
+      <span class="chat-sub">11 ballers · no refs</span>
+      <span class="online"><span class="online-dot"></span>{{ onlineCount() }} online</span>
     </div>
 
-    <div class="message-list">
-      @for (message of messages(); track message.id) {
+    <div class="message-list" #list (scroll)="onScroll()">
+      @for (row of rows(); track row.id) {
         <div class="message">
-          <span class="avatar" [style.background]="avatarColor(message.user.avatarHue)">
-            {{ initials(message.user.displayName) }}
-          </span>
+          <span class="avatar" [style.background]="row.color">{{ row.initials }}</span>
           <div class="message-body">
             <div class="message-meta">
-              <span class="author">{{ message.user.displayName }}</span>
-              <span class="timestamp">{{ message.createdAt.slice(0, 16).replace('T', ' ') }}</span>
+              <span class="author">{{ row.name }}</span>
+              <span class="timestamp">{{ row.time }}</span>
             </div>
-            <div class="bubble">{{ message.body }}</div>
+            <div class="bubble">{{ row.body }}</div>
           </div>
         </div>
       } @empty {
-        <p class="mbl-label empty">No trash talked yet. Someone has to start it.</p>
+        <p class="mbl-label empty">
+          {{ loaded() ? 'No trash talked yet. Someone has to start it.' : 'Loading…' }}
+        </p>
       }
     </div>
 
     @if (auth.isSignedIn()) {
+      <!-- Enter sends because the input is in a form with a submit button. -->
       <form class="composer" (ngSubmit)="send()">
         <input
           class="mbl-input"
           name="draft"
           [(ngModel)]="draft"
-          placeholder="Say something you'll regret…"
+          placeholder="Talk your talk…"
           autocomplete="off"
+          maxlength="2000"
         />
         <button class="mbl-btn-primary send-btn" type="submit" [disabled]="sending()">Send</button>
       </form>
+      @if (sendError(); as error) {
+        <p class="send-error" role="status">{{ error }}</p>
+      }
     } @else {
       <p class="signin-note mbl-label"><a routerLink="/login">Sign in</a> to talk trash</p>
     }

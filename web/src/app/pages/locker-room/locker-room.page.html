@@ -1,0 +1,42 @@
+<div class="page-head">
+  <h2>Locker Room</h2>
+  <span class="page-sub">{{ rounds }} teams per manager · one owner per team</span>
+</div>
+
+<div class="roster-grid">
+  @for (card of rosters(); track card.user.id) {
+    <div class="mbl-card roster">
+      <div class="card-head">
+        <span class="avatar" [style.background]="avatarColor(card.user.avatarHue)">
+          {{ initials(card.user.displayName) }}
+        </span>
+        <span class="manager">{{ card.user.displayName }}</span>
+        <span class="total">{{ card.total }}</span>
+      </div>
+
+      @if (card.teams.length > 0) {
+        <div class="chips">
+          @for (team of orderedTeams(card); track team.id) {
+            <span class="chip" [title]="team.school + ' — ' + team.points + ' fantasy points'">
+              @if (team.rank !== null) {
+                <span class="rank">#{{ team.rank }}</span>
+              }
+              <span class="school">{{ team.school }}</span>
+              <span class="record">{{ team.wins }}-{{ team.losses }}</span>
+              <span class="points" [class.scored]="team.points > 0">{{ team.points }}pt</span>
+            </span>
+          }
+        </div>
+        @if (picksRemaining(card) > 0) {
+          <p class="pending mbl-label">{{ picksRemaining(card) }} picks still to come</p>
+        }
+      } @else {
+        <p class="pending mbl-label">No teams yet — see you in the draft room</p>
+      }
+    </div>
+  } @empty {
+    <div class="mbl-card">
+      <p class="mbl-label">{{ loaded() ? 'No managers in this league yet' : 'Loading rosters…' }}</p>
+    </div>
+  }
+</div>

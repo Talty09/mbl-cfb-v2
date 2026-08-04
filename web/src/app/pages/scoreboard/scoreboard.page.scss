@@ -1,0 +1,267 @@
+// The Baller banner's two colours are the only ones in the handoff's token list
+// with no --mbl-* custom property, so they are named here rather than inlined.
+$baller-gradient: linear-gradient(105deg, #1a1608, #12151c 55%);
+$baller-border: #3d3113;
+
+.baller {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: $baller-gradient;
+  border: 1px solid $baller-border;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 22px;
+}
+
+.baller-avatar {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--mbl-bg-deep);
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.baller-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.baller-label {
+  color: var(--mbl-gold);
+}
+
+.baller-name {
+  margin: 2px 0 4px;
+  font-size: 30px;
+  letter-spacing: 1px;
+}
+
+.baller-blurb {
+  margin: 0;
+  color: var(--mbl-text-2);
+  font-size: 13px;
+}
+
+.baller-points {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.baller-number {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--mbl-gold);
+}
+
+.board-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.board-title {
+  margin: 0;
+  font-size: 26px;
+}
+
+.board-note {
+  margin: 2px 0 0;
+  letter-spacing: 1.5px;
+}
+
+.week-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.step-btn {
+  width: 32px;
+  height: 32px;
+  background: var(--mbl-surface);
+  border: 1px solid var(--mbl-border);
+  border-radius: 8px;
+  color: var(--mbl-text-2);
+  font-family: var(--mbl-font-display);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--mbl-border-hover);
+    color: var(--mbl-gold);
+  }
+
+  &:disabled {
+    color: var(--mbl-disabled);
+    cursor: default;
+  }
+}
+
+.current-btn {
+  background: var(--mbl-chip);
+  border: 1px solid var(--mbl-border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  color: var(--mbl-text-2);
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--mbl-gold);
+    color: var(--mbl-gold);
+  }
+}
+
+.load-error {
+  color: var(--mbl-red);
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 14px;
+}
+
+.game-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.status {
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.status-live {
+  color: var(--mbl-red);
+  animation: mblPulse 1.6s ease-in-out infinite;
+}
+
+.status-final {
+  color: var(--mbl-text-2);
+}
+
+.status-upcoming {
+  color: var(--mbl-muted);
+}
+
+.note {
+  flex-shrink: 0;
+  background: var(--mbl-chip);
+  border: 1px solid var(--mbl-border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  color: var(--mbl-text-2);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+// Marks a win worth more than a plain one — ranked, bowl, playoff, title.
+.note-highlight {
+  background: var(--mbl-gold-tint);
+  border-color: var(--mbl-gold);
+  color: var(--mbl-gold);
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+
+  &.dimmed .school,
+  &.dimmed .score {
+    color: var(--mbl-muted);
+  }
+}
+
+.rank {
+  width: 16px;
+  flex-shrink: 0;
+  color: var(--mbl-gold);
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-align: right;
+}
+
+.school {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--mbl-text);
+}
+
+.record {
+  flex-shrink: 0;
+  color: var(--mbl-muted);
+  font-size: 12px;
+}
+
+.owner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  background: var(--mbl-chip);
+  border: 1px solid var(--mbl-border);
+  border-radius: 999px;
+  padding: 2px 9px 2px 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mbl-text-2);
+}
+
+.owner-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.score {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--mbl-text);
+}
+
+.board-empty p:last-child {
+  margin: 6px 0 0;
+  color: var(--mbl-text-2);
+}

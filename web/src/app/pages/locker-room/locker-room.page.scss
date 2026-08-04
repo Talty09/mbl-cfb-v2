@@ -1,0 +1,107 @@
+.page-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+  }
+}
+
+.page-sub {
+  color: var(--mbl-muted);
+  font-size: 13px;
+}
+
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 14px;
+}
+
+.roster {
+  padding: 16px;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--mbl-bg-deep);
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.manager {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.total {
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--mbl-gold);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  background: var(--mbl-chip);
+  border: 1px solid var(--mbl-border);
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mbl-text-2);
+}
+
+.rank {
+  font-family: var(--mbl-font-display);
+  font-weight: 700;
+  color: var(--mbl-gold);
+}
+
+.record,
+.points {
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--mbl-muted);
+}
+
+// Gold only once a team has actually banked something, so a preseason card of
+// zeroes stays quiet instead of looking like eleven leaders.
+.points.scored {
+  color: var(--mbl-gold);
+  font-weight: 700;
+}
+
+.pending {
+  margin: 12px 0 0;
+}

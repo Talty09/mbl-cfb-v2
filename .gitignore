@@ -10,6 +10,8 @@ node_modules/
 # Build output
 dist/
 out-tsc/
+# Scratch Angular builds used to typecheck templates without clobbering dist/
+dist-check-*/
 
 # Cloudflare
 .wrangler/
