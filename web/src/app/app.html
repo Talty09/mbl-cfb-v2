@@ -9,7 +9,10 @@
     </a>
 
     <div class="header-right">
-      <span class="season-label mbl-label">{{ season }} Season</span>
+      @if (isLive()) {
+        <span class="live-pill">Live</span>
+      }
+      <span class="season-label mbl-label">{{ weekLabel() }}</span>
       @if (auth.user(); as user) {
         <span class="user-chip">
           <span class="avatar" [style.background]="avatarColor(user.avatarHue)">{{ initials(user.displayName) }}</span>
@@ -28,6 +31,11 @@
     <a class="tab" [routerLink]="tab.path" routerLinkActive="active">{{ tab.label }}</a>
   }
 </nav>
+
+@if (syncError(); as error) {
+  <!-- A stale scoreboard is otherwise indistinguishable from a quiet Saturday. -->
+  <p class="sync-error" role="status">Scores may be out of date — last update failed: {{ error }}</p>
+}
 
 <main class="page">
   <router-outlet />

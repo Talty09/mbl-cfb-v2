@@ -3,7 +3,11 @@ import type { ApiError } from 'shared';
 import { attachSession } from './middleware/auth';
 import { adminRoutes } from './routes/admin';
 import { authRoutes } from './routes/auth';
+import { chatRoutes } from './routes/chat';
+import { draftRoutes } from './routes/draft';
+import { leagueRoutes } from './routes/league';
 import { metaRoutes } from './routes/meta';
+import { pulseRoutes } from './routes/pulse';
 import type { AppEnv } from './types';
 
 /**
@@ -22,6 +26,10 @@ api.use('*', attachSession);
 
 api.route('/', authRoutes);
 api.route('/', metaRoutes);
+api.route('/', pulseRoutes);
+api.route('/', draftRoutes);
+api.route('/', leagueRoutes);
+api.route('/', chatRoutes);
 api.route('/', adminRoutes);
 
 api.notFound((c) => c.json<ApiError>({ error: 'Not found' }, 404));

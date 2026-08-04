@@ -53,6 +53,28 @@
   gap: 16px;
 }
 
+// Shown only while real games are in progress, per /api/meta — not decoration.
+.live-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--mbl-red-bright);
+  color: var(--mbl-bg-deep);
+  font-family: var(--mbl-font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: mblPulse 1.6s ease-in-out infinite;
+}
+
+.sync-error {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  color: var(--mbl-red);
+  font-size: 13px;
+}
+
 .user-chip {
   display: flex;
   align-items: center;
