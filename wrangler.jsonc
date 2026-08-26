@@ -5,6 +5,10 @@
   "compatibility_date": "2026-07-01",
   "compatibility_flags": ["nodejs_compat"],
 
+  // Serve on mbl.tom-talty.workers.dev. Set explicitly because the subdomain was
+  // toggled off in the dashboard, and the config has to win over that.
+  "workers_dev": true,
+
   // The Angular SPA is served straight from the assets binding. Asset requests
   // that don't invoke the Worker aren't billed as Worker requests, which is
   // what keeps us clear of the free plan's 100k requests/day ceiling.
@@ -27,8 +31,9 @@
     {
       "binding": "DB",
       "database_name": "mbl",
-      // Filled in by `wrangler d1 create mbl` during setup.
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      // From `wrangler d1 create mbl` (2026-08-05). Not a secret: the database is
+      // only reachable with account credentials.
+      "database_id": "32c2c555-e6b0-447b-99c6-847e596bf5be",
       "migrations_dir": "api/migrations"
     }
   ],
