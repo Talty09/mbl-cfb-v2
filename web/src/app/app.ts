@@ -5,6 +5,7 @@ import { ApiService } from './core/api.service';
 import { AuthService } from './core/auth.service';
 import { PulseService } from './core/pulse.service';
 import { StaleChunkService } from './core/stale-chunk.service';
+import { DRAFT_ROOM_ENABLED } from './core/features';
 import { CURRENT_SEASON, avatarColor, initials } from './core/models';
 
 @Component({
@@ -51,7 +52,8 @@ export class App {
     { path: '/standings', label: 'Standings' },
     { path: '/past-scores', label: 'Past Scores' },
     { path: '/locker-room', label: 'Locker Room' },
-    { path: '/draft-room', label: 'Draft Room' },
+    // Hidden, not deleted — see DRAFT_ROOM_ENABLED.
+    ...(DRAFT_ROOM_ENABLED ? [{ path: '/draft-room', label: 'Draft Room' }] : []),
     { path: '/trash-talk', label: 'Trash Talk' },
   ];
 
