@@ -183,6 +183,83 @@ describe('auth', () => {
     });
   });
 
+  describe('one-time passphrase / POST /api/auth/change-password', () => {
+    beforeEach(async () => {
+      await seedManagers([{ username: 'newbie', password: 'crab-otter-lentil-flare-birch-sonar' }]);
+      const db = getDb(testEnv);
+      const { users } = await import('../db/schema');
+      const { eq } = await import('drizzle-orm');
+      await db.update(users).set({ mustChangePassword: true }).where(eq(users.username, 'newbie'));
+    });
+
+    it('flags a manager still on their issued passphrase after login', async () => {
+      const response = await post('/api/auth/login', {
+        username: 'newbie',
+        password: 'crab-otter-lentil-flare-birch-sonar',
+      });
+      expect(await response.json()).toMatchObject({ user: { mustChangePassword: true } });
+    });
+
+    it('blocks other write routes while the flag is set', async () => {
+      const cookie = sessionCookieFrom(
+        await post('/api/auth/login', {
+          username: 'newbie',
+          password: 'crab-otter-lentil-flare-birch-sonar',
+        }),
+      )!;
+      const response = await post('/api/chat', { body: 'hello' }, cookie);
+      expect(response.status).toBe(403);
+    });
+
+    it('lets the flagged manager set a new password, which clears the flag', async () => {
+      const cookie = sessionCookieFrom(
+        await post('/api/auth/login', {
+          username: 'newbie',
+          password: 'crab-otter-lentil-flare-birch-sonar',
+        }),
+      )!;
+
+      const changed = await post('/api/auth/change-password', { newPassword: 'password1234' }, cookie);
+      expect(changed.status).toBe(200);
+      expect(await changed.json()).toMatchObject({ user: { mustChangePassword: false } });
+
+      // The session survives the change and is no longer blocked from other writes.
+      const chat = await post('/api/chat', { body: 'hello' }, cookie);
+      expect(chat.status).toBe(201);
+    });
+
+    it('accepts the new password on the next login and no longer flags the manager', async () => {
+      const cookie = sessionCookieFrom(
+        await post('/api/auth/login', {
+          username: 'newbie',
+          password: 'crab-otter-lentil-flare-birch-sonar',
+        }),
+      )!;
+      await post('/api/auth/change-password', { newPassword: 'password1234' }, cookie);
+
+      const login = await post('/api/auth/login', { username: 'newbie', password: 'password1234' });
+      expect(login.status).toBe(200);
+      expect(await login.json()).toMatchObject({ user: { mustChangePassword: false } });
+    });
+
+    it('rejects a new password under 4 characters', async () => {
+      const cookie = sessionCookieFrom(
+        await post('/api/auth/login', {
+          username: 'newbie',
+          password: 'crab-otter-lentil-flare-birch-sonar',
+        }),
+      )!;
+      const response = await post('/api/auth/change-password', { newPassword: 'abc' }, cookie);
+      expect(response.status).toBe(400);
+    });
+
+    it('requires a session', async () => {
+      expect((await post('/api/auth/change-password', { newPassword: 'password1234' })).status).toBe(
+        401,
+      );
+    });
+  });
+
   describe('session storage', () => {
     it('stores only a digest, never the token itself', async () => {
       const login = await post('/api/auth/login', { username: 'tom', password: PASSPHRASE });

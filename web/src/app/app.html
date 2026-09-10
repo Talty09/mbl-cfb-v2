@@ -1,5 +1,9 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
 
+@if (auth.mustChangePassword()) {
+  <app-force-password-change />
+}
+
 <header class="header">
   <div class="header-inner">
     <a class="brand" routerLink="/scoreboard">

@@ -77,6 +77,7 @@ export async function resolveSession(db: Db, token: string): Promise<SessionUser
       lastName: users.lastName,
       avatarHue: users.avatarHue,
       isCommissioner: users.isCommissioner,
+      mustChangePassword: users.mustChangePassword,
     })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))

@@ -118,13 +118,15 @@ for (const [i, row] of rows.entries()) {
     `${row.lastName.toLowerCase()}:${row.firstName.toLowerCase()}` === COMMISSIONER_LAST_FIRST;
 
   statements.push(
-    `INSERT INTO users (id, username, display_name, first_name, last_name, avatar_hue, is_commissioner, password_hash, created_at)`,
+    `INSERT INTO users (id, username, display_name, first_name, last_name, avatar_hue, is_commissioner, password_hash, must_change_password, created_at)`,
     `  VALUES (${sqlString(id)}, ${sqlString(username)}, ${sqlString(row.displayName)}, ` +
       `${sqlString(row.firstName)}, ${sqlString(row.lastName)}, ${assignHue(i, rows.length)}, ` +
-      `${isCommissioner ? 'true' : 'false'}, ${sqlString(hash)}, unixepoch() * 1000)`,
+      `${isCommissioner ? 'true' : 'false'}, ${sqlString(hash)}, true, unixepoch() * 1000)`,
     `  ON CONFLICT(username) DO UPDATE SET password_hash = excluded.password_hash,`,
     `    display_name = excluded.display_name, avatar_hue = excluded.avatar_hue,`,
-    `    is_commissioner = excluded.is_commissioner;`,
+    // ON CONFLICT skips column defaults, so a reissued passphrase must
+    // explicitly force the change prompt back on — it won't happen for free.
+    `    is_commissioner = excluded.is_commissioner, must_change_password = true;`,
     '',
   );
 

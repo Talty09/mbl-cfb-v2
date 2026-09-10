@@ -22,6 +22,9 @@ export class AuthService {
   readonly user = this.userSignal.asReadonly();
   readonly isSignedIn = computed(() => this.userSignal() !== null);
 
+  /** True while a signed-in manager is still on their commissioner-issued one-time passphrase. */
+  readonly mustChangePassword = computed(() => this.userSignal()?.mustChangePassword ?? false);
+
   /** False until the initial `/auth/me` settles, so the UI can avoid flicker. */
   private readonly readySignal = signal(false);
   readonly ready = this.readySignal.asReadonly();
@@ -46,6 +49,13 @@ export class AuthService {
   async login(username: string, password: string): Promise<void> {
     const response = await firstValueFrom(
       this.http.post<SessionResponse>('/api/auth/login', { username, password }),
+    );
+    this.userSignal.set(response.user);
+  }
+
+  async changePassword(newPassword: string): Promise<void> {
+    const response = await firstValueFrom(
+      this.http.post<SessionResponse>('/api/auth/change-password', { newPassword }),
     );
     this.userSignal.set(response.user);
   }

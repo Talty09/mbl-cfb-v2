@@ -67,7 +67,13 @@ export interface SeededManager {
 
 /** Insert a season plus managers with known passphrases. */
 export async function seedManagers(
-  specs: { username: string; password: string; isCommissioner?: boolean }[],
+  specs: {
+    username: string;
+    password: string;
+    isCommissioner?: boolean;
+    /** Defaults to false — most tests want a manager already past the one-time-password gate. */
+    mustChangePassword?: boolean;
+  }[],
 ): Promise<SeededManager[]> {
   const db = getDb(testEnv);
 
@@ -90,6 +96,7 @@ export async function seedManagers(
       // A low iteration count keeps the suite fast; the format is identical, and
       // password.test.ts already covers that verification is iteration-agnostic.
       passwordHash: await hashPassword(spec.password, 1_000),
+      mustChangePassword: spec.mustChangePassword ?? false,
       createdAt: new Date(),
     });
     seeded.push({ id, username: spec.username, password: spec.password });

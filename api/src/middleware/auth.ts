@@ -29,10 +29,20 @@ export const attachSession = createMiddleware<AppEnv>(async (c, next) => {
   await next();
 });
 
-/** Gate write actions — drafting and posting to chat. */
+/**
+ * Gate write actions — drafting and posting to chat.
+ *
+ * A manager still on their commissioner-issued one-time passphrase is blocked
+ * from every other write until they set their own password, with a single
+ * exemption for that endpoint itself — otherwise it could never unblock them.
+ */
 export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
-  if (!c.get('user')) {
+  const user = c.get('user');
+  if (!user) {
     return c.json<ApiError>({ error: 'Sign in to do that' }, 401);
+  }
+  if (user.mustChangePassword && c.req.path !== '/api/auth/change-password') {
+    return c.json<ApiError>({ error: 'Set a new password to continue' }, 403);
   }
   await next();
 });

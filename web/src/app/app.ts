@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import type { Meta } from 'shared';
 import { ApiService } from './core/api.service';
 import { AuthService } from './core/auth.service';
+import { ForcePasswordChangeComponent } from './core/force-password-change.component';
 import { PulseService } from './core/pulse.service';
 import { StaleChunkService } from './core/stale-chunk.service';
 import { DRAFT_ROOM_ENABLED } from './core/features';
@@ -10,7 +11,7 @@ import { CURRENT_SEASON, avatarColor, initials } from './core/models';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, ForcePasswordChangeComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
