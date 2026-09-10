@@ -70,13 +70,39 @@ export const draftOrderRequestSchema = z.object({
 export type DraftOrderRequest = z.infer<typeof draftOrderRequestSchema>;
 
 /** Commissioner-only: force an ingest slice instead of waiting for cron. */
-export const adminSyncRequestSchema = z.object({
-  /** Omit to advance whatever slice the cursor points at. */
-  slice: z.enum(['teams', 'calendar', 'games', 'rankings', 'points']).optional(),
-  season: z.number().int().min(2000).max(2100).optional(),
-  week: z.number().int().min(1).max(20).optional(),
-  seasonType: z.enum(['regular', 'postseason']).optional(),
-});
+export const adminSyncRequestSchema = z
+  .object({
+    /** Omit to run the calendar slice, preserving the existing admin behavior. */
+    slice: z.enum(['teams', 'calendar', 'games', 'rankings', 'points']).optional(),
+    season: z.number().int().min(2000).max(2100).optional(),
+    week: z.number().int().min(1).max(20).optional(),
+    seasonType: z.enum(['regular', 'postseason']).optional(),
+  })
+  .superRefine((request, context) => {
+    const targetValues = [request.season, request.week, request.seasonType];
+    const hasAnyTarget = targetValues.some((value) => value !== undefined);
+    const hasCompleteTarget = targetValues.every((value) => value !== undefined);
+
+    if (hasAnyTarget && !hasCompleteTarget) {
+      context.addIssue({
+        code: 'custom',
+        message: 'season, week, and seasonType must be provided together',
+      });
+    }
+
+    if (
+      hasCompleteTarget &&
+      request.slice !== 'games' &&
+      request.slice !== 'rankings' &&
+      request.slice !== 'points'
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['slice'],
+        message: 'Historical targets support games, rankings, or points only',
+      });
+    }
+  });
 export type AdminSyncRequest = z.infer<typeof adminSyncRequestSchema>;
 
 /** Guard used by both sides when validating a completed draft. */

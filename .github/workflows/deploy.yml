@@ -72,11 +72,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 # Before the deploy job can succeed, one-time setup is needed:
 #
-#   1. `npx wrangler login`
-#   2. `npx wrangler d1 create mbl` — paste the returned database_id into
-#      wrangler.jsonc, replacing REPLACE_WITH_D1_DATABASE_ID
-#   3. `npx wrangler secret put CFBD_API_KEY`
-#   4. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository secrets
-#   5. `npm run seed:build && npm run seed:remote` to create the managers
+#   1. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID to the GitHub
+#      `production` environment (see GO_LIVE.md).
+#   2. Set the Worker secret with `npx wrangler secret put CFBD_API_KEY`.
+#   3. Seed accounts and import the 2026 paper draft using GO_LIVE.md.
 #
 # The `verify` job needs none of this and runs on every push and pull request.

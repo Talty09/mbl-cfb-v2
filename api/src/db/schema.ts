@@ -20,7 +20,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/sqlite-core';
 
-/** The 11 league managers. Seeded by the commissioner; there is no self-signup. */
+/** Commissioner-seeded login accounts; season participation comes from draft_order. */
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   /** Login identifier, always stored lowercased (e.g. "tom", "josh.bozym"). */

@@ -230,6 +230,23 @@ describe('recomputeWeekPoints', () => {
     expect(await storedPoints()).toHaveLength(0);
   });
 
+  it('removes a stale row when a scored game moves out of the requested week', async () => {
+    await own('usr_tom', MICHIGAN, 1);
+    await addGame({ id: 1, week: 1, home: MICHIGAN, away: ALABAMA, homePoints: 30, awayPoints: 20 });
+    await addGame({ id: 2, week: 2, home: MICHIGAN, away: TEXAS, homePoints: 27, awayPoints: 24 });
+    await recomputeWeekPoints(getDb(testEnv), SEASON, 1, 'regular');
+    await recomputeWeekPoints(getDb(testEnv), SEASON, 2, 'regular');
+
+    const { eq } = await import('drizzle-orm');
+    await getDb(testEnv).update(games).set({ week: 2 }).where(eq(games.id, 1));
+
+    await recomputeWeekPoints(getDb(testEnv), SEASON, 1, 'regular');
+
+    const rows = await storedPoints();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ gameId: 2, week: 2 });
+  });
+
   it('scopes recomputation to the requested week', async () => {
     await own('usr_tom', MICHIGAN, 1);
     await addGame({ id: 1, week: 1, home: MICHIGAN, away: ALABAMA, homePoints: 30, awayPoints: 20 });

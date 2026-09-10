@@ -9,7 +9,7 @@
  * `game_points` from D1, so a CFBD outage degrades freshness and nothing else.
  */
 
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import type { SeasonType } from 'shared';
 import { games, pollRanks, syncState, teams } from '../../db/schema';
 import { cfbdGet } from '../../lib/cfbd';
@@ -49,6 +49,8 @@ export interface SliceOutcome {
   /** Rows touched, for the log line. */
   rows?: number;
 }
+
+export type HistoricalIngestStage = Extract<IngestStage, 'games' | 'rankings' | 'points'>;
 
 async function readState(db: Db, key: string) {
   return db.select().from(syncState).where(eq(syncState.key, key)).get();
@@ -104,9 +106,15 @@ async function syncTeams(db: Db, env: Env, season: number): Promise<SliceOutcome
       .onConflictDoUpdate({
         target: teams.id,
         set: {
-          school: teams.school,
-          conference: teams.conference,
-          classification: teams.classification,
+          school: sql`excluded.school`,
+          mascot: sql`excluded.mascot`,
+          abbreviation: sql`excluded.abbreviation`,
+          conference: sql`excluded.conference`,
+          division: sql`excluded.division`,
+          classification: sql`excluded.classification`,
+          color: sql`excluded.color`,
+          altColor: sql`excluded.alt_color`,
+          logoUrl: sql`excluded.logo_url`,
         },
       }),
   );
@@ -204,12 +212,18 @@ async function syncGames(
       .onConflictDoUpdate({
         target: games.id,
         set: {
-          completed: games.completed,
-          homePoints: games.homePoints,
-          awayPoints: games.awayPoints,
-          startDate: games.startDate,
-          notes: games.notes,
-          kind: games.kind,
+          season: sql`excluded.season`,
+          week: sql`excluded.week`,
+          seasonType: sql`excluded.season_type`,
+          startDate: sql`excluded.start_date`,
+          completed: sql`excluded.completed`,
+          homeTeamId: sql`excluded.home_team_id`,
+          awayTeamId: sql`excluded.away_team_id`,
+          homePoints: sql`excluded.home_points`,
+          awayPoints: sql`excluded.away_points`,
+          notes: sql`excluded.notes`,
+          kind: sql`excluded.kind`,
+          venue: sql`excluded.venue`,
         },
       }),
   );
@@ -258,6 +272,13 @@ async function syncRankings(
     rank: rank.rank,
   }));
 
+  // An empty regular-season AP response is much more likely to be an upstream
+  // outage or schema change than a real poll. Never erase a known-good poll and
+  // silently downgrade ranked wins to one point.
+  if (seasonType === 'regular' && rows.length === 0) {
+    throw new Error(`CFBD returned no AP Top 25 for regular-season week ${week}`);
+  }
+
   // A week's poll is a complete set, so replace it rather than merging — a team
   // that drops out must actually disappear.
   await db
@@ -284,6 +305,43 @@ async function syncRankings(
         : `no AP poll published for week ${week}`,
     rows: written.rows,
   };
+}
+
+/** ---- Historical runner ---------------------------------------------- */
+
+/**
+ * Run one exact per-week slice without consulting or advancing cron state.
+ * Historical repairs must not move the live calendar or scheduler rotation.
+ */
+export async function runHistoricalIngestSlice(
+  db: Db,
+  env: Env,
+  target: {
+    stage: HistoricalIngestStage;
+    season: number;
+    week: number;
+    seasonType: SeasonType;
+  },
+): Promise<SliceOutcome> {
+  const { stage, season, week, seasonType } = target;
+
+  switch (stage) {
+    case 'games':
+      return syncGames(db, env, season, week, seasonType);
+    case 'rankings':
+      return syncRankings(db, env, season, week, seasonType);
+    case 'points': {
+      const result = await recomputeWeekPoints(db, season, week, seasonType);
+      return {
+        stage: 'points',
+        season,
+        week,
+        seasonType,
+        detail: `${result.rowsWritten} scoring rows, ${result.pointsAwarded} points from ${result.gamesScored} completed games`,
+        rows: result.rowsWritten,
+      };
+    }
+  }
 }
 
 /** ---- Runner ---------------------------------------------------------- */

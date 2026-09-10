@@ -24,7 +24,12 @@
     "seed:build": "tsx api/scripts/make-seed.ts",
     "seed:local": "wrangler d1 execute mbl --local --file=api/seeds/managers.sql",
     "seed:remote": "wrangler d1 execute mbl --remote --file=api/seeds/managers.sql",
-    "make-password": "tsx api/scripts/make-password.ts"
+    "paper-draft:build": "tsx api/scripts/import-paper-draft.ts",
+    "paper-draft:local": "wrangler d1 migrations apply mbl --local --config wrangler.paper-draft.jsonc",
+    "paper-draft:remote": "wrangler d1 migrations apply mbl --remote --config wrangler.paper-draft.jsonc",
+    "password:build": "tsx api/scripts/make-password.ts",
+    "password:local": "wrangler d1 execute mbl --local --file=api/seeds/password-reset.sql",
+    "password:remote": "wrangler d1 execute mbl --remote --file=api/seeds/password-reset.sql"
   },
   "devDependencies": {
     "concurrently": "^10.0.4",

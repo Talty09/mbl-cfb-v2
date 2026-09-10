@@ -10,7 +10,7 @@ import type {
   WeekScoresResponse,
 } from 'shared';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { games, picks, pollRanks, syncState, teams } from '../db/schema';
+import { draftOrder, games, picks, pollRanks, syncState, teams } from '../db/schema';
 import { getDb } from '../lib/db';
 import { CALENDAR_KEY } from '../lib/season';
 import { AP_POLL, recomputeWeekPoints } from '../services/points';
@@ -160,6 +160,14 @@ async function setCalendar(week: number, seasonType: SeasonType = 'regular'): Pr
 async function seedSeason(): Promise<void> {
   await addTeams();
 
+  await getDb(testEnv).insert(draftOrder).values(
+    ['tom', 'zac', 'chris', 'dana'].map((username, index) => ({
+      seasonYear: SEASON,
+      slot: index + 1,
+      userId: `usr_${username}`,
+    })),
+  );
+
   await own('tom', MICHIGAN, 1);
   await own('tom', OHIO_STATE, 2);
   await own('zac', TEXAS, 3);
@@ -285,6 +293,20 @@ describe('scoring views', () => {
         isCommissioner: true,
         points: 5,
       });
+    });
+
+    it('excludes a login-only user who is not participating in this season', async () => {
+      await seedManagers([{ username: 'josh.yagel', password: 'still-valid' }]);
+
+      const managers = await get<Manager[]>('/api/league/managers');
+      const standings = await get<StandingsResponse>('/api/standings');
+      const week = await get<WeekScoresResponse>('/api/weeks/1/scores');
+      const rosters = await get<RosterCard[]>('/api/rosters');
+
+      expect(managers.body.map((manager) => manager.username)).not.toContain('josh.yagel');
+      expect(standings.body.rows.map((row) => row.user.id)).not.toContain('usr_josh_yagel');
+      expect(week.body.rows.map((row) => row.user.id)).not.toContain('usr_josh_yagel');
+      expect(rosters.body.map((card) => card.user.id)).not.toContain('usr_josh_yagel');
     });
   });
 

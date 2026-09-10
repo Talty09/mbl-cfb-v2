@@ -3,7 +3,11 @@ import type { ApiError } from 'shared';
 import { adminSyncRequestSchema } from 'shared/requests';
 import { getDb } from '../lib/db';
 import { requireCommissioner } from '../middleware/auth';
-import { runIngestSlice } from '../services/ingest';
+import {
+  runHistoricalIngestSlice,
+  runIngestSlice,
+  type HistoricalIngestStage,
+} from '../services/ingest';
 import type { AppEnv } from '../types';
 
 export const adminRoutes = new Hono<AppEnv>();
@@ -23,9 +27,19 @@ adminRoutes.post('/admin/sync', requireCommissioner, async (c) => {
   }
 
   try {
-    const outcome = await runIngestSlice(getDb(c.env), c.env, {
-      force: parsed.data.slice ?? 'calendar',
-    });
+    const db = getDb(c.env);
+    const { slice, season, week, seasonType } = parsed.data;
+    const isHistoricalStage =
+      slice === 'games' || slice === 'rankings' || slice === 'points';
+    const outcome =
+      isHistoricalStage && season !== undefined && week !== undefined && seasonType !== undefined
+        ? await runHistoricalIngestSlice(db, c.env, {
+            stage: slice as HistoricalIngestStage,
+            season,
+            week,
+            seasonType,
+          })
+        : await runIngestSlice(db, c.env, { force: slice ?? 'calendar' });
     return c.json(outcome);
   } catch (error) {
     // Surface the real reason — the commissioner asked for this explicitly, and

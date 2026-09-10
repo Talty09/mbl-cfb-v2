@@ -64,8 +64,8 @@ authRoutes.post('/auth/login', async (c) => {
     .get();
 
   // No dummy hash on the unknown-username path. That defence is against
-  // account enumeration, and this app lists all eleven managers by name on every
-  // page — there is nothing to enumerate. Skipping it also keeps a failed login
+  // account enumeration, and this private league publicly lists its competitors
+  // by name — there is little to enumerate. Skipping it also keeps a failed login
   // well clear of the 10 ms CPU ceiling.
   if (!user?.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
     return c.json<ApiError>({ error: 'Invalid username or password.' }, 401);

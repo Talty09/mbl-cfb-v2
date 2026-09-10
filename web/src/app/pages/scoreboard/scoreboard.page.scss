@@ -1,14 +1,9 @@
-// The Baller banner's two colours are the only ones in the handoff's token list
-// with no --mbl-* custom property, so they are named here rather than inlined.
-$baller-gradient: linear-gradient(105deg, #1a1608, #12151c 55%);
-$baller-border: #3d3113;
-
 .baller {
   display: flex;
   align-items: center;
   gap: 18px;
-  background: $baller-gradient;
-  border: 1px solid $baller-border;
+  background: var(--mbl-baller-gradient);
+  border: 1px solid var(--mbl-baller-border);
   border-radius: 10px;
   padding: 18px 22px;
   margin-bottom: 22px;
@@ -138,7 +133,7 @@ $baller-border: #3d3113;
 
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr));
   gap: 14px;
 }
 
@@ -264,4 +259,55 @@ $baller-border: #3d3113;
 .board-empty p:last-child {
   margin: 6px 0 0;
   color: var(--mbl-text-2);
+}
+
+@media (max-width: 600px) {
+  .baller {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .baller-avatar {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+  }
+
+  .baller-name {
+    font-size: 25px;
+  }
+
+  .baller-number {
+    font-size: 36px;
+  }
+
+  .board-title {
+    font-size: 23px;
+  }
+
+  .board-note {
+    display: none;
+  }
+
+  .school {
+    font-size: 18px;
+  }
+
+  .owner {
+    max-width: 92px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .record {
+    display: none;
+  }
+
+  .team {
+    gap: 6px;
+  }
 }
