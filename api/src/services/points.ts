@@ -14,7 +14,7 @@
 import { and, eq } from 'drizzle-orm';
 import type { SeasonType } from 'shared';
 import { gamePoints, games, picks, pollRanks } from '../db/schema';
-import type { Db } from '../lib/db';
+import { insertChunked, type Db } from '../lib/db';
 import { pointsForGame, type ScorableGame } from './scoring';
 
 /** The AP poll is the one the league's Top-25 bonus refers to. */
@@ -147,9 +147,7 @@ export async function recomputeWeekPoints(
       ),
     );
 
-  if (rows.length > 0) {
-    await db.insert(gamePoints).values(rows);
-  }
+  await insertChunked(rows, 9, (chunk) => db.insert(gamePoints).values(chunk));
 
   return {
     week,

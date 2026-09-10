@@ -21,7 +21,7 @@ export const TEAM_NAME_ALIASES: Readonly<Record<string, string>> = {
   Connecticut: 'UConn',
   Hawaii: "Hawai'i",
   'Louisiana State': 'LSU',
-  Massachusetts: 'UMass',
+  'Miami (FL)': 'Miami',
   Mississippi: 'Ole Miss',
   'Nevada-Las Vegas': 'UNLV',
   'North Carolina State': 'NC State',
