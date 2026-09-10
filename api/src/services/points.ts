@@ -11,7 +11,7 @@
  * fact, both converge on the right answer without bookkeeping.
  */
 
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { SeasonType } from 'shared';
 import { gamePoints, games, picks, pollRanks } from '../db/schema';
 import type { Db } from '../lib/db';
@@ -134,12 +134,18 @@ export async function recomputeWeekPoints(
     });
   }
 
-  // Replace rather than upsert: a game that stops qualifying (a correction, a
-  // roster change) must lose its row, which an upsert would leave behind.
-  const weekGameIds = weekGames.map((game) => game.id);
-  if (weekGameIds.length > 0) {
-    await db.delete(gamePoints).where(inArray(gamePoints.gameId, weekGameIds));
-  }
+  // Replace the entire requested slice rather than only the games still present
+  // in it. CFBD can move or remove a game during a schedule correction; deleting
+  // by current game ids would leave that game's old points behind forever.
+  await db
+    .delete(gamePoints)
+    .where(
+      and(
+        eq(gamePoints.season, season),
+        eq(gamePoints.week, week),
+        eq(gamePoints.seasonType, seasonType),
+      ),
+    );
 
   if (rows.length > 0) {
     await db.insert(gamePoints).values(rows);

@@ -1,4 +1,7 @@
-import type { D1Migration } from '@cloudflare/vitest-pool-workers';
+declare module '*.csv?raw' {
+  const content: string;
+  export default content;
+}
 
 /**
  * Tests see the Worker's own bindings plus the migration list that
@@ -6,10 +9,8 @@ import type { D1Migration } from '@cloudflare/vitest-pool-workers';
  * inside a test), so declare it on the generated env rather than casting at
  * every use.
  */
-declare global {
-  namespace Cloudflare {
-    interface Env {
-      TEST_MIGRATIONS: D1Migration[];
-    }
+declare namespace Cloudflare {
+  interface Env {
+    TEST_MIGRATIONS: import('@cloudflare/vitest-pool-workers').D1Migration[];
   }
 }

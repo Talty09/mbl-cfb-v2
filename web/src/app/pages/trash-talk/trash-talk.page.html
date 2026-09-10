@@ -1,12 +1,20 @@
 <div class="chat-wrap">
   <div class="chat-card">
     <div class="chat-head">
-      <h2 class="chat-title">The Trash Talk</h2>
-      <span class="chat-sub">11 ballers · no refs</span>
+      <h1 class="chat-title">The Trash Talk</h1>
+      <span class="chat-sub">League chat · no refs</span>
       <span class="online"><span class="online-dot"></span>{{ onlineCount() }} online</span>
     </div>
 
-    <div class="message-list" #list (scroll)="onScroll()">
+    <div
+      class="message-list"
+      #list
+      (scroll)="onScroll()"
+      role="log"
+      aria-label="Trash Talk messages"
+      aria-live="polite"
+      aria-relevant="additions"
+    >
       @for (row of rows(); track row.id) {
         <div class="message">
           <span class="avatar" [style.background]="row.color">{{ row.initials }}</span>
@@ -33,6 +41,7 @@
           name="draft"
           [(ngModel)]="draft"
           placeholder="Talk your talk…"
+          aria-label="Trash Talk message"
           autocomplete="off"
           maxlength="2000"
         />

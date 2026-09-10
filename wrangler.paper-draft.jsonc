@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mbl-paper-draft-import",
+  "compatibility_date": "2026-07-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mbl",
+      "database_id": "32c2c555-e6b0-447b-99c6-847e596bf5be",
+      "migrations_dir": "api/paper-draft-migrations"
+    }
+  ]
+}

@@ -30,7 +30,7 @@ import type {
   WeekScoresResponse,
   WeekScoresRow,
 } from 'shared';
-import { gamePoints, games, picks, pollRanks, teams, users } from '../db/schema';
+import { draftOrder, gamePoints, games, picks, pollRanks, teams, users } from '../db/schema';
 import { getDb, type Db } from '../lib/db';
 import { readCalendar, resolveSeason, type CalendarCursor } from '../lib/season';
 import { AP_POLL } from '../services/points';
@@ -142,11 +142,13 @@ async function ranksForWeek(
   return new Map(rows.map((row) => [row.teamId, row.rank]));
 }
 
-/** Every manager, for endpoints that must list all of them regardless of scoring. */
-async function allManagers(db: Db): Promise<ManagerRef[]> {
+/** Every manager participating in a season, even if they have not scored. */
+async function allManagers(db: Db, season: number): Promise<ManagerRef[]> {
   const rows = await db
     .select({ id: users.id, displayName: users.displayName, avatarHue: users.avatarHue })
-    .from(users)
+    .from(draftOrder)
+    .innerJoin(users, eq(users.id, draftOrder.userId))
+    .where(eq(draftOrder.seasonYear, season))
     .all();
   return rows.map(managerRef);
 }
@@ -279,8 +281,10 @@ leagueRoutes.get('/league/managers', async (c) => {
       isCommissioner: users.isCommissioner,
       points: sql<number>`coalesce(sum(${gamePoints.points}), 0)`,
     })
-    .from(users)
+    .from(draftOrder)
+    .innerJoin(users, eq(users.id, draftOrder.userId))
     .leftJoin(gamePoints, and(eq(gamePoints.userId, users.id), eq(gamePoints.season, season)))
+    .where(eq(draftOrder.seasonYear, season))
     .groupBy(users.id)
     .all();
 
@@ -526,7 +530,7 @@ leagueRoutes.get('/standings', async (c) => {
   const calendar = await readCalendar(db, season);
 
   const [managers, totals, weekly] = await Promise.all([
-    allManagers(db),
+    allManagers(db, season),
     db
       .select({
         userId: gamePoints.userId,
@@ -622,7 +626,7 @@ leagueRoutes.get('/weeks/:week/scores', async (c) => {
   const slice = resolveSlice(week, parseSeasonType(c.req.query('seasonType')), calendar);
 
   const [managers, weekRows, totals] = await Promise.all([
-    allManagers(db),
+    allManagers(db, season),
     db
       .select({ userId: gamePoints.userId, points: sql<number>`sum(${gamePoints.points})` })
       .from(gamePoints)
@@ -663,8 +667,8 @@ leagueRoutes.get('/weeks/:week/scores', async (c) => {
  * The Locker Room: one card per manager with their drafted teams and what each
  * has earned.
  *
- * Starts from `users`, not `picks`, so all eleven cards exist before the draft
- * has happened. `game_points` joins on team alone because ownership is exclusive
+ * Starts from the season's `draft_order`, not `picks`, so every active competitor
+ * has a card even before drafting. `game_points` joins on team alone because ownership is exclusive
  * per season — `picks_season_team_unq` is the guarantee — so a team's scoring
  * rows can only belong to the manager holding it. That also makes each card's
  * total identical to the manager's standings total.
@@ -686,10 +690,12 @@ leagueRoutes.get('/rosters', async (c) => {
         conference: teams.conference,
         points: sql<number>`coalesce(sum(${gamePoints.points}), 0)`,
       })
-      .from(users)
+      .from(draftOrder)
+      .innerJoin(users, eq(users.id, draftOrder.userId))
       .leftJoin(picks, and(eq(picks.userId, users.id), eq(picks.seasonYear, season)))
       .leftJoin(teams, eq(teams.id, picks.teamId))
       .leftJoin(gamePoints, and(eq(gamePoints.teamId, picks.teamId), eq(gamePoints.season, season)))
+      .where(eq(draftOrder.seasonYear, season))
       .groupBy(users.id, picks.teamId)
       .all(),
     realRecords(db, season),

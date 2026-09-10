@@ -21,6 +21,11 @@ dist-check-*/
 
 # Generated seed SQL — contains password hashes, rebuild with `npm run seed:build`
 api/seeds/managers.sql
+api/seeds/password-reset.sql
+# Generated paper-draft migration is transient; rebuild it from a current D1 team export.
+api/paper-draft-migrations/
+# Legacy output path from the pre-migration importer.
+api/seeds/2026-paper-draft.sql
 
 # Logs
 *.log

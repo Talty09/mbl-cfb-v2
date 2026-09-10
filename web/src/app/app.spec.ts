@@ -28,4 +28,12 @@ describe('App', () => {
     const labels = Array.from(compiled.querySelectorAll('.nav .tab')).map((t) => t.textContent);
     expect(labels.some((l) => l?.includes('Draft Room'))).toBe(DRAFT_ROOM_ENABLED);
   });
+
+  it('advertises the current 10-player league size', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const text = (fixture.nativeElement as HTMLElement).textContent;
+    expect(text).toContain('10-player fantasy college football league');
+    expect(text).not.toContain('11 ballers');
+  });
 });
