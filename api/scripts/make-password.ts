@@ -13,7 +13,7 @@ const hash = await hashPassword(passphrase);
 const sqlString = (value: string) => `'${value.replace(/'/g, "''")}'`;
 const output = resolve(import.meta.dirname, '..', 'seeds', 'password-reset.sql');
 const sql =
-  `UPDATE users SET password_hash = ${sqlString(hash)} WHERE username = ${sqlString(username)};\n` +
+  `UPDATE users SET password_hash = ${sqlString(hash)}, must_change_password = 1 WHERE username = ${sqlString(username)};\n` +
   `SELECT username, changes() AS passwords_updated FROM users WHERE username = ${sqlString(username)};\n`;
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, sql, 'utf8');

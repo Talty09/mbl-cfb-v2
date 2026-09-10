@@ -2,10 +2,10 @@ import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import type { ApiError, SessionResponse } from 'shared';
-import { loginRequestSchema } from 'shared/requests';
+import { changePasswordRequestSchema, loginRequestSchema } from 'shared/requests';
 import { sessions, users } from '../db/schema';
 import { getDb } from '../lib/db';
-import { verifyPassword } from '../lib/password';
+import { hashPassword, verifyPassword } from '../lib/password';
 import {
   createSession,
   revokeSession,
@@ -58,6 +58,7 @@ authRoutes.post('/auth/login', async (c) => {
       avatarHue: users.avatarHue,
       isCommissioner: users.isCommissioner,
       passwordHash: users.passwordHash,
+      mustChangePassword: users.mustChangePassword,
     })
     .from(users)
     .where(eq(users.username, username))
@@ -91,6 +92,29 @@ authRoutes.post('/auth/logout', async (c) => {
 /** Who am I? Returns `{ user: null }` for guests — see SessionResponse. */
 authRoutes.get('/auth/me', (c) => {
   return c.json<SessionResponse>({ user: c.get('user') ?? null });
+});
+
+/**
+ * Set a new password, replacing the commissioner-issued one-time passphrase.
+ * No re-entry of the current password: the session already proves the caller
+ * just authenticated with valid credentials, and this app has no complexity
+ * rules to enforce, so there's nothing else to check. The existing session
+ * stays valid — no forced re-login.
+ */
+authRoutes.post('/auth/change-password', requireAuth, async (c) => {
+  const parsed = changePasswordRequestSchema.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) {
+    return c.json<ApiError>({ error: 'Enter a new password.' }, 400);
+  }
+
+  const user = c.get('user')!;
+  const passwordHash = await hashPassword(parsed.data.newPassword);
+  await getDb(c.env)
+    .update(users)
+    .set({ passwordHash, mustChangePassword: false })
+    .where(eq(users.id, user.id));
+
+  return c.json<SessionResponse>({ user: { ...user, mustChangePassword: false } });
 });
 
 /**

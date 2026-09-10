@@ -35,6 +35,10 @@ export const users = sqliteTable('users', {
     .default(false),
   /** `pbkdf2-sha256$<iterations>$<salt-b64url>$<derived-b64url>`. Null = no login yet. */
   passwordHash: text('password_hash'),
+  /** True until the manager sets their own password, replacing the one-time issued passphrase. */
+  mustChangePassword: integer('must_change_password', { mode: 'boolean' })
+    .notNull()
+    .default(true),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),

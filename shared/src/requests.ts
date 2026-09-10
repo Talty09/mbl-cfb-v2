@@ -31,6 +31,12 @@ export const loginRequestSchema = z.object({
 });
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 
+/** No complexity rule on purpose — this is a private friends league, not a bank. */
+export const changePasswordRequestSchema = z.object({
+  newPassword: z.string().min(4).max(512),
+});
+export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>;
+
 export const chatPostRequestSchema = z.object({
   body: z.string().trim().min(1).max(2000),
 });

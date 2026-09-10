@@ -17,6 +17,8 @@ export interface SessionUser {
   lastName: string;
   avatarHue: number;
   isCommissioner: boolean;
+  /** True until the manager replaces their commissioner-issued one-time passphrase. */
+  mustChangePassword: boolean;
 }
 
 /**
