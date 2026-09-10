@@ -49,7 +49,15 @@ npm run seed:build | tee /tmp/mbl-2026-credentials.txt
 npm run seed:remote
 ```
 
-`seed:build` creates fresh six-word passphrases for all 11 login accounts and prints them once. It does not put plaintext passwords in Git. Treat `/tmp/mbl-2026-credentials.txt` as sensitive and delete it after distribution. Running `seed:build` plus `seed:remote` again rotates every manager's password, so do not rerun it casually.
+`seed:build` creates fresh six-word passphrases for all 10 login accounts (from `api/seeds/users.csv`) and prints them once. It does not put plaintext passwords in Git. Treat `/tmp/mbl-2026-credentials.txt` as sensitive and delete it after distribution. Running `seed:build` plus `seed:remote` again rotates every manager's password, so do not rerun it casually.
+
+Josh Yagel is not competing in 2026 and has no login: he was removed from `api/seeds/users.csv` entirely, not merely excluded from the draft. If production was seeded before this change, delete his row directly:
+
+```bash
+npx wrangler d1 execute mbl --remote --command "DELETE FROM users WHERE username='josh.yagel';"
+```
+
+His `sessions`, `draft_order`, and `chat_messages` rows (if any) cascade-delete with him.
 
 ## 5. Load teams, the paper draft, and Week 1
 
@@ -64,7 +72,7 @@ npm run paper-draft:build -- /tmp/mbl-teams.json
 npm run paper-draft:remote
 ```
 
-The draft generator requires exactly 100 unique teams and the confirmed 10-manager snake order. It excludes `josh.yagel` from the 2026 competition without deleting his login. The generated draft is applied through a dedicated atomic D1 migration, not raw `d1 execute`; see `PAPER_DRAFT_IMPORT.md`.
+The draft generator requires exactly 100 unique teams and the confirmed 10-manager snake order. The generated draft is applied through a dedicated atomic D1 migration, not raw `d1 execute`; see `PAPER_DRAFT_IMPORT.md`.
 
 Use the commissioner-only `POST /api/admin/sync` endpoint in this order:
 
@@ -91,7 +99,7 @@ npx wrangler d1 execute mbl --remote --command \
  (SELECT coalesce(sum(points),0) FROM game_points WHERE season=2026 AND week=1 AND season_type='regular') AS week1_points;"
 ```
 
-Expected structural values are 11 login users, 10 participants, and 100 picks. Inspect the actual Week 1 game, poll, and point counts rather than hard-coding them.
+Expected structural values are 10 login users, 10 participants, and 100 picks. Inspect the actual Week 1 game, poll, and point counts rather than hard-coding them.
 
 Also verify:
 
@@ -118,7 +126,7 @@ Suggested message:
 
 > MBL is live: https://<your-domain>. Your username is `<username>` and your temporary league passphrase is `<six-word-passphrase>`. Sign in, save it in your password manager, and use Trash Talk responsibly—or at least creatively.
 
-Josh Yagel may sign in and use Trash Talk, but he will not appear in 2026 standings or rosters. Test one non-commissioner account before sending all ten competitive-player messages.
+Josh Yagel is not playing in 2026 and has no account — do not send him credentials. Test one non-commissioner account before sending all ten player messages.
 
 To rotate one person's password later without changing everyone else's:
 
