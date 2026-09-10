@@ -30,6 +30,8 @@ interface CsvRow {
   firstName: string;
   lastName: string;
   displayName: string;
+  /** Explicit override; empty string means "derive it from the name heuristic". */
+  username: string;
 }
 
 function parseCsv(text: string): CsvRow[] {
@@ -46,6 +48,8 @@ function parseCsv(text: string): CsvRow[] {
   const firstIdx = index('first_name');
   const lastIdx = index('last_name');
   const displayIdx = index('display_name');
+  // Optional: absent entirely in older CSVs, and blank per-row is the common case.
+  const usernameIdx = columns.indexOf('username');
 
   return lines.map((line) => {
     const cells = line.split(',');
@@ -53,23 +57,27 @@ function parseCsv(text: string): CsvRow[] {
       firstName: cells[firstIdx]!.trim(),
       lastName: cells[lastIdx]!.trim(),
       displayName: cells[displayIdx]!.trim(),
+      username: usernameIdx === -1 ? '' : (cells[usernameIdx] ?? '').trim(),
     };
   });
 }
 
 /**
- * First name when it's unique in the league, otherwise first.last — so most
- * managers get to type `tom` while the two Joshes get `josh.bozym` and
- * `josh.yagel`.
+ * A row's own `username` column wins when set — pinned so a manager's login
+ * and the paper-draft alias table don't shift just because someone else with
+ * the same first name joined or left the league. Otherwise: first name when
+ * it's unique in the league, otherwise first.last.
  */
 function assignUsernames(rows: CsvRow[]): string[] {
   const firstNameCounts = new Map<string, number>();
   for (const row of rows) {
+    if (row.username) continue;
     const key = row.firstName.toLowerCase();
     firstNameCounts.set(key, (firstNameCounts.get(key) ?? 0) + 1);
   }
 
   return rows.map((row) => {
+    if (row.username) return row.username;
     const first = row.firstName.toLowerCase();
     return firstNameCounts.get(first) === 1 ? first : `${first}.${row.lastName.toLowerCase()}`;
   });
