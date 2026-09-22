@@ -1,0 +1,69 @@
+name: Ingest freshness check
+
+# Free-tier substitute for an uptime monitor: no code on the free Cloudflare
+# plan can page anyone, so this polls the public, unauthenticated /api/meta
+# endpoint from outside the Worker and fails (red X + GitHub's default
+# workflow-failure email to the repo owner) when ingest looks broken.
+#
+# Born from the 2026-09-20 incident (see the Week 3 scoring investigation):
+# the cron trigger silently stopped for 40+ hours with nothing to notice it.
+# `sync_state.last_error` now gets recorded reliably (see the sibling fix in
+# this PR), but that only helps if something is actually looking at it.
+on:
+  schedule:
+    # Independent of the ingest's own */5 * * * * cadence on purpose — this
+    # must not share fate with the thing it's checking.
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Check /api/meta freshness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch /api/meta and evaluate staleness
+        run: |
+          set -euo pipefail
+
+          META_URL="https://mbl.tom-talty.workers.dev/api/meta"
+          # Generous relative to the 5-minute cron: a couple of missed
+          # firings or a slow CFBD response must not cry wolf. Still catches
+          # a real outage in minutes instead of days.
+          STALE_THRESHOLD_MS=1200000 # 20 minutes
+
+          body=$(curl -sf "$META_URL")
+          echo "meta: $body"
+
+          last_sync_at=$(echo "$body" | jq -r '.lastSyncAt')
+          last_sync_error=$(echo "$body" | jq -r '.lastSyncError')
+
+          if [ "$last_sync_error" != "null" ]; then
+            echo "::error::ingest reported an error: $last_sync_error"
+            exit 1
+          fi
+
+          # College football runs August through mid-January (see
+          # isInSeasonWindow in api/src/services/ingest/plan.ts). Outside
+          # that window the ingest is expected to sit idle, so a stale/null
+          # lastSyncAt there is normal, not a failure.
+          month=$(date -u +%-m)
+          if [ "$month" -lt 8 ] && [ "$month" -ne 1 ]; then
+            echo "outside the season window (month=$month) — skipping staleness check"
+            exit 0
+          fi
+
+          if [ "$last_sync_at" = "null" ]; then
+            echo "::error::in season but ingest has never run (lastSyncAt is null)"
+            exit 1
+          fi
+
+          now_ms=$(( $(date -u +%s) * 1000 ))
+          age_ms=$(( now_ms - last_sync_at ))
+
+          if [ "$age_ms" -gt "$STALE_THRESHOLD_MS" ]; then
+            age_min=$(( age_ms / 60000 ))
+            echo "::error::ingest has not run in ${age_min} minutes (threshold: $((STALE_THRESHOLD_MS / 60000)))"
+            exit 1
+          fi
+
+          echo "ingest is fresh (age: $((age_ms / 1000))s)"
