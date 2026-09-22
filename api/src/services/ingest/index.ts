@@ -352,6 +352,15 @@ export async function runHistoricalIngestSlice(
  * Errors are recorded in `sync_state.last_error` and rethrown so the cron logs
  * them; `/api/meta` surfaces the message, so a broken ingest is visible in the
  * UI rather than silently stale.
+ *
+ * Everything — including resolving the season/cursor/stage, not just the slice
+ * itself — runs inside the try. A 2026-09-20 incident (see Week 3 scoring
+ * investigation) left `sync_state` frozen for over a day with `last_error`
+ * still null: the failure happened in this setup work, which used to sit
+ * ahead of the try block, so nothing ever recorded it. Whatever actually broke
+ * that day was on Cloudflare's side, but this gap meant a recurrence would
+ * again be invisible — `lastRunAt` and `lastError` are the only signal
+ * `/api/meta` has, and both would keep reporting stale-but-healthy.
  */
 export async function runIngestSlice(
   db: Db,
@@ -359,37 +368,44 @@ export async function runIngestSlice(
   options: { now?: Date; force?: IngestStage } = {},
 ): Promise<SliceOutcome> {
   const now = options.now ?? new Date();
-  const season = await resolveSeason(db, env);
 
-  if (!options.force && !isInSeasonWindow(now)) {
-    return { stage: 'skipped', season, detail: 'outside the August-January season window' };
-  }
-
-  const [cursorRow, teamsRow, calendarRow] = await Promise.all([
-    readState(db, CURSOR_KEY),
-    readState(db, TEAMS_KEY),
-    readState(db, CALENDAR_KEY),
-  ]);
-
-  const cursor = readCursor(cursorRow?.cursor);
-  const stage =
-    options.force ??
-    chooseStage(
-      cursor,
-      {
-        teamsSyncedAt: teamsRow?.lastRunAt?.getTime() ?? null,
-        calendarSyncedAt: calendarRow?.lastRunAt?.getTime() ?? null,
-      },
-      now,
-    );
-
-  // The calendar decides which week the per-week stages operate on; the cursor
-  // only carries the rotation.
-  const calendar = await readCalendar(db, season);
-  const week = calendar?.week ?? cursor.week;
-  const seasonType = calendar?.seasonType ?? cursor.seasonType;
+  let cursor = INITIAL_CURSOR;
+  let week: number = INITIAL_CURSOR.week;
+  let seasonType: SeasonType = INITIAL_CURSOR.seasonType;
+  let stageLabel = 'setup';
 
   try {
+    const season = await resolveSeason(db, env);
+
+    if (!options.force && !isInSeasonWindow(now)) {
+      return { stage: 'skipped', season, detail: 'outside the August-January season window' };
+    }
+
+    const [cursorRow, teamsRow, calendarRow] = await Promise.all([
+      readState(db, CURSOR_KEY),
+      readState(db, TEAMS_KEY),
+      readState(db, CALENDAR_KEY),
+    ]);
+
+    cursor = readCursor(cursorRow?.cursor);
+    const stage =
+      options.force ??
+      chooseStage(
+        cursor,
+        {
+          teamsSyncedAt: teamsRow?.lastRunAt?.getTime() ?? null,
+          calendarSyncedAt: calendarRow?.lastRunAt?.getTime() ?? null,
+        },
+        now,
+      );
+    stageLabel = stage;
+
+    // The calendar decides which week the per-week stages operate on; the cursor
+    // only carries the rotation.
+    const calendar = await readCalendar(db, season);
+    week = calendar?.week ?? cursor.week;
+    seasonType = calendar?.seasonType ?? cursor.seasonType;
+
     let outcome: SliceOutcome;
 
     switch (stage) {
@@ -437,11 +453,15 @@ export async function runIngestSlice(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     // Advance the rotation even on failure, so one persistently broken stage
-    // cannot starve the others.
+    // cannot starve the others. Best-effort: if the D1 write itself fails too,
+    // don't let that mask the original error, but don't let it stay silent
+    // either — this is exactly the gap that let sync_state go stale unnoticed.
     await writeState(db, CURSOR_KEY, {
       cursor: JSON.stringify(advance({ ...cursor, week, seasonType })),
       lastRunAt: now,
-      lastError: `${stage}: ${message}`,
+      lastError: `${stageLabel}: ${message}`,
+    }).catch((writeError: unknown) => {
+      console.error('failed to record ingest failure:', writeError);
     });
     throw error;
   }
