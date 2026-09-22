@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { games, pollRanks, seasons, syncState, teams } from '../../db/schema';
+const CURSOR_KEY = 'ingest';
 import { getDb } from '../../lib/db';
 import { migrate, testEnv } from '../../test/helpers';
 import { runIngestSlice } from '.';
@@ -155,5 +156,21 @@ describe('CFBD ingest integration', () => {
     );
 
     expect(await db.select().from(pollRanks)).toHaveLength(1);
+  });
+
+  it('records a failure that happens before a stage is even chosen, not just inside one', async () => {
+    // Regression for the 2026-09-20 incident: resolveSeason() (and the cursor/
+    // calendar reads around it) used to run ahead of the try block, so a D1
+    // hiccup there left sync_state frozen with last_error still null — the
+    // ingest looked idle, not broken. Dropping `seasons` mid-request reproduces
+    // a real D1-level failure at that exact point.
+    const db = getDb(testEnv);
+    await testEnv.DB.prepare('DROP TABLE seasons').run();
+
+    await expect(runIngestSlice(db, testEnv, {})).rejects.toThrow();
+
+    const state = await db.select().from(syncState).where(eq(syncState.key, CURSOR_KEY)).get();
+    expect(state?.lastError).toMatch(/setup/i);
+    expect(state?.lastRunAt).not.toBeNull();
   });
 });
